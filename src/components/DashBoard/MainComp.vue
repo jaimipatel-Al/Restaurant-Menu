@@ -14,11 +14,7 @@
           love great flavors, we bring you the best dishes, guides, and tips to satisfy your
           cravings. Let's explore more together!
         </p>
-        <button
-          class="bg-orange-700 text-white py-3 px-4 rounded-md hover:bg-orange-500 transition duration-200 ease-in text-xl"
-        >
-          Explore Food
-        </button>
+        <button class="button">Explore Food</button>
       </div>
       <img src="@/assets/img/dal-rice.jpg" alt="Dal Rice" class="w-auto h-100" />
     </section>
@@ -32,11 +28,7 @@
           several teams to perform specific tasks. Without teamwork nothing is possible. So, we are
           doing team work over 2years and giving more facilities in our Hamburger Shop.
         </p>
-        <button
-          class="bg-orange-700 text-white py-3 px-4 rounded-md hover:bg-orange-500 transition duration-200 ease-in text-xl"
-        >
-          Contact Us
-        </button>
+        <button class="button">Contact Us</button>
       </div>
     </section>
     <section class="text-center bg-gray-100 p-10">

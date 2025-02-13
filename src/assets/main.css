@@ -30,4 +30,46 @@
     .delivery-box {
         @apply flex-1 w-full h-96 mx-5 flex flex-col items-center justify-end
     }
+
+    .button {
+        @apply bg-orange-700 text-white py-3 px-4 rounded-md hover:bg-orange-500 transition duration-200 ease-in text-xl disabled:bg-orange-400
+    }
+
+    .auth-box {
+        @apply w-5/6 shadow shadow-2xl shadow-slate-900 m-auto flex-between
+    }
+
+    .auth-img-box {
+        @apply flex-1 overflow-hidden w-full h-full
+    }
+
+    .auth-title {
+        @apply text-5xl text-orange-600 font-bold mb-2
+    }
+
+    .auth-detail {
+        @apply text-gray-600 font-semibold mb-8
+    }
+
+    .auth label {
+        @apply block mt-4 font-semibold mb-1
+    }
+
+    .input {
+        @apply border border-orange-200 rounded rounded-md p-3 text-gray-900 placeholder:text-gray-400 focus:outline-none text-lg w-full
+    }
+
+    .error-message {
+        @apply w-96 text-sm text-red-600 h-4 px-2
+    }
+
+    .password-icon {
+        @apply w-8 text-orange-600 cursor-pointer
+    }
+}
+
+.auth {
+    background: linear-gradient(to left, #ff915ac9, #ffae56c5, #ffc95ea8, #ffe056c8, #fffa70d8);
+    width: 100vw;
+    height: 100vh;
 }
