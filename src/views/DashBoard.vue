@@ -1,6 +1,9 @@
 <script setup>
+import HeaderComp from '@/components/HeaderComp.vue'
 </script>
 
 <template>
-  <main></main>
+  <main>
+    <HeaderComp />
+  </main>
 </template>
