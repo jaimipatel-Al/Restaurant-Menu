@@ -32,7 +32,7 @@
     }
 
     .button {
-        @apply bg-orange-700 text-white py-3 px-4 rounded-md hover:bg-orange-500 transition duration-200 ease-in text-xl disabled:bg-orange-400
+        @apply bg-orange-700 text-white disabled:bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in text-lg md:text-xl py-2 px-3 md:py-3 md:px-4
     }
 
     .auth-box {
@@ -44,7 +44,7 @@
     }
 
     .auth-title {
-        @apply text-5xl text-orange-600 font-bold mb-2
+        @apply text-4xl md:text-5xl text-orange-600 font-bold mb-2
     }
 
     .auth-detail {
@@ -66,10 +66,46 @@
     .password-icon {
         @apply w-8 text-orange-600 cursor-pointer
     }
+
+    .add-edit-form label {
+        @apply block mt-3 font-semibold text-lg
+    }
+
+    .add-edit-form button {
+        @apply button flex items-center justify-center w-full mt-10
+    }
+
+    .upload-button {
+        @apply w-8 border border-orange-600 p-1.5 text-orange-600 rounded rounded-full cursor-pointer hover:bg-orange-600 hover:text-white transition duration-100 ease-in
+    }
+
+    .button-edit {
+        @apply text-green-500 w-10 p-2 rounded rounded-full hover:bg-orange-100 cursor-pointer
+    }
+
+    .button-delete {
+        @apply text-red-500 w-10 p-2 rounded rounded-full hover:bg-orange-100 cursor-pointer
+    }
 }
 
 .auth {
     background: linear-gradient(to left, #ff915ac9, #ffae56c5, #ffc95ea8, #ffe056c8, #fffa70d8);
     width: 100vw;
     height: 100vh;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #ffbf8a89;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e08b4ec1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ff974d;
 }
