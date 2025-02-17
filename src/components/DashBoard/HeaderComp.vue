@@ -1,7 +1,16 @@
 <script setup>
 import { RouterLink, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
+import toast from '@/plugin/toast'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
+const logout = () => {
+  authStore.logOut()
+  toast.success('User Logged Out successfully')
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -17,7 +26,7 @@ const router = useRouter()
       <RouterLink to="/" class="router-link">Categories</RouterLink>
       <RouterLink to="/" class="router-link">Foods</RouterLink>
       <RouterLink to="/" class="router-link">Login</RouterLink>
-      <RouterLink to="/" class="router-link">Logout</RouterLink>
+      <span class="router-link" @click="logout()">Logout</span>
     </nav>
   </header>
 </template>

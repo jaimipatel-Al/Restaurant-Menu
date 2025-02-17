@@ -3,7 +3,14 @@ import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from '@heroicons/vue/24/solid'
 import { Form, Field } from 'vee-validate'
 import { ref } from 'vue'
 import * as yup from 'yup'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
+import toast from '@/plugin/toast'
+import { useAuthStore } from '@/stores/authStore'
+import { useRouter } from 'vue-router'
 
+const authStore = useAuthStore()
+const router = useRouter()
 const schema = yup.object({
   Name: yup.string().required().max(20),
   Email: yup.string().required().email(),
@@ -19,9 +26,9 @@ const schema = yup.object({
     .string()
     .required('Confirm Password is required')
     .oneOf([yup.ref('Password'), ''], 'Passwords must match'),
-  Type: yup.string().required('Register as is required'),
 })
 
+const name = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
@@ -30,7 +37,35 @@ const isConfirmPassword = ref(false)
 const type = ref('customer')
 const isSignup = ref(false)
 
-const signup = () => {}
+const signup = async () => {
+  isSignup.value = true
+
+  const user = {
+    name: name.value,
+    email: email.value,
+    password: password.value,
+    userType: type.value,
+  }
+
+  await Axios.post(api.signUp, user)
+    .then(({ data }) => {
+      authStore.sessionStore({
+        password: user.password,
+        email: user.email,
+      })
+
+      toast.success(
+        data?.message ?? `${user.userType == 'customer' ? 'Customer ' : 'Owner '} Sign Up Success!`
+      )
+      router.push('/login')
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message ?? "User Can't Sign Up!")
+    })
+    .finally(() => {
+      isSignup.value = false
+    })
+}
 </script>
 
 <template>
@@ -45,7 +80,7 @@ const signup = () => {}
           Already have an account?
           <RouterLink to="/login" class="text-orange-600 underline">Login</RouterLink>
         </p>
-        <Form @submit="signup" :validation-schema="schema" v-slot="{ errors }">
+        <Form @submit="signup()" :validation-schema="schema" v-slot="{ errors }">
           <label for="name">Name</label>
           <Field
             v-model="name"

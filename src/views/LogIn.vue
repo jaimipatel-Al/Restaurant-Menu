@@ -1,9 +1,16 @@
 <script setup>
 import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from '@heroicons/vue/24/solid'
 import { Form, Field } from 'vee-validate'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import * as yup from 'yup'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
+import toast from '@/plugin/toast'
+import { useAuthStore } from '@/stores/authStore'
+import { useRouter } from 'vue-router'
 
+const authStore = useAuthStore()
+const router = useRouter()
 const schema = yup.object({
   Email: yup.string().required().email(),
   Password: yup
@@ -22,7 +29,45 @@ const isPassword = ref(false)
 const isRemember = ref(false)
 const isLogin = ref(false)
 
-const login = () => {}
+const login = async () => {
+  isLogin.value = true
+
+  const user = {
+    email: email.value,
+    password: password.value,
+  }
+
+  await Axios.post(api.login, user)
+    .then(({ data }) => {
+      if (isRemember.value)
+        authStore.sessionStore({
+          password: user.password,
+          email: user.email,
+        })
+      else authStore.sessionRemove()
+
+      authStore.loginUser(data.data)
+      toast.success(data?.message ?? 'User Login Success!')
+      router.push('/')
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message ?? "User Can't Login!")
+    })
+    .finally(() => {
+      isLogin.value = false
+    })
+}
+
+onMounted(() => {
+  const authUser = sessionStorage.getItem('authUser')
+
+  if (authUser) {
+    const user = JSON.parse(authUser)
+    email.value = user.email
+    password.value = user.password
+    isRemember.value = true
+  }
+})
 </script>
 
 <template>
