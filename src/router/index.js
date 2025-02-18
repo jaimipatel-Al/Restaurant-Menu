@@ -14,15 +14,22 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('../views/LogIn.vue'),
+      meta: { auth: false },
     },
     {
       path: '/signup',
       name: 'Signup',
       component: () => import('../views/SignUp.vue'),
+      meta: { auth: false },
     },
 
     {
       path: '/item',
+      name: 'Item',
+      component: () => import('../views/item/ItemList.vue'),
+    },
+    {
+      path: '/item/:id',
       name: 'Item',
       component: () => import('../views/item/ItemList.vue'),
     },
@@ -64,7 +71,7 @@ const currentUser = () => {
 }
 
 router.beforeEach(async (to, from, next) => {
-  if (to.matched.some((record) => record.meta.auth)) {
+  if (to.matched.some((record) => record?.meta?.auth ?? false)) {
     if (await currentUser()) next()
     else next('/login')
   } else next()

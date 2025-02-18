@@ -1,8 +1,59 @@
 <script setup>
-import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/solid'
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  ArrowPathIcon,
+  NoSymbolIcon,
+} from '@heroicons/vue/24/solid'
+import { onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
+import { useAuthStore } from '@/stores/authStore'
+import toast from '@/plugin/toast'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
+const isLoading = ref(false)
+const categories = ref([])
+
+const getCategories = async () => {
+  isLoading.value = true
+
+  await Axios.get(api.listCategory)
+    .then(({ data }) => {
+      categories.value = data?.data?.map((e) => {
+        return { ...e, isDeleting: false }
+      })
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+const deleteCategory = async (data) => {
+  data.isDeleting = true
+
+  await Axios.delete(`${api.deleteCategory}${data._id}`)
+    .then(() => {
+      toast.success('Category deleted successfully!!')
+      getCategories()
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      data.isDeleting = false
+    })
+}
+
+onMounted(() => {
+  getCategories()
+})
 </script>
 
 <template>
@@ -10,30 +61,41 @@ const router = useRouter()
     <div class="flex-between p-8">
       <h1 class="auth-title">Category</h1>
       <RouterLink to="/category/add-category" class="button flex items-center"
-        ><PlusIcon class="w-6 mr-2" /> Add Category</RouterLink
+        ><PlusIcon class="w-12 mr-2" /> Add Category</RouterLink
       >
     </div>
-    <div class="h-5/6 overflow-y-auto">
+    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-12 mx-3" /> Loading...</div>
+    <div v-else-if="categories?.length == 0" class="no-data">
+      <NoSymbolIcon class="w-12 mx-3" /> No Category Available
+    </div>
+    <div v-else class="h-5/6 overflow-y-auto">
       <div
-        v-for="i in 10"
-        :key="i"
-        class="md:w-5/6 mx-auto p-5 my-8 shadow shadow-2xl rounded rounded-xl flex space-x-10"
+        v-for="c in categories"
+        :key="c._id"
+        class="md:w-5/6 mx-auto p-5 my-8 shadow shadow-2xl rounded rounded-xl flex space-x-5 flex-col sm:flex-row"
         style="background: rgb(255, 255, 255, 0.8)"
       >
-        <div>
-          <img src="@/assets/img/default-category.png" alt="Category Image" class="w-80 h-auto" />
+        <div class="w-full sm:w-96 md:w-80 flex-none">
+          <img v-if="c.image" :src="c.image" alt="Category Image" />
+          <img v-else src="@/assets/img/default-category.png" alt="Category Image" />
         </div>
-        <div>
-          <h3 class="text-orange-700 text-2xl font-semibold">Chinese Food</h3>
-          <RouterLink to="/item" class="text-orange-400 text-sm">Show Items</RouterLink>
-          <p class="auth-detail">
-            Chinese food is a diverse cuisine that includes dishes like chow mein, dumplings, and
-            Peking duck
-          </p>
-        </div>
-        <div class="flex items-start">
-          <PencilIcon class="button-edit" @click="router.push(`/category/edit-category/${i}`)" />
-          <TrashIcon class="button-delete" />
+        <div class="flex-auto">
+          <div
+            class="flex items-start justify-between"
+            v-if="c.createdBy == authStore.userData.userId"
+          >
+            <h3 class="text-orange-700 text-2xl font-semibold">{{ c.title }}</h3>
+            <div class="flex">
+              <PencilIcon
+                class="button-edit"
+                @click="router.push(`/category/edit-category/${c._id}`)"
+              />
+              <TrashIcon v-if="!c.isDeleting" class="button-delete" @click="deleteCategory(c)" />
+              <ArrowPathIcon v-else class="button-delete" />
+            </div>
+          </div>
+          <RouterLink :to="`/item/${c._id}`" class="text-orange-400 text-sm">Show Items</RouterLink>
+          <p class="auth-detail">{{ c.description }}</p>
         </div>
       </div>
     </div>
