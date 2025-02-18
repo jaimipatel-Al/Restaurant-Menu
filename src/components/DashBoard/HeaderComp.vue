@@ -22,11 +22,14 @@ const logout = () => {
       </h1>
     </div>
     <nav class="flex justify-end items-center text-xl font-semibold space-x-5 mx-10">
-      <RouterLink to="/" class="router-link">Home</RouterLink>
-      <RouterLink to="/" class="router-link">Categories</RouterLink>
-      <RouterLink to="/" class="router-link">Foods</RouterLink>
-      <RouterLink to="/" class="router-link">Login</RouterLink>
-      <span class="router-link" @click="logout()">Logout</span>
+      <template v-if="authStore?.userData?.userId">
+        <RouterLink to="/" class="router-link">Home</RouterLink>
+        <RouterLink to="/menu" class="router-link">Menu</RouterLink>
+        <RouterLink to="/category" class="router-link">Categories</RouterLink>
+        <RouterLink to="/item" class="router-link">Item</RouterLink>
+      </template>
+      <span v-if="authStore?.userData?.userId" class="router-link" @click="logout()">Logout</span>
+      <RouterLink v-else to="/signup" class="router-link">Sign Up</RouterLink>
     </nav>
   </header>
 </template>
