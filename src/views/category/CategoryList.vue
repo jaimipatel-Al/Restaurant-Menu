@@ -72,20 +72,22 @@ onMounted(() => {
       <div
         v-for="c in categories"
         :key="c._id"
-        class="md:w-5/6 mx-auto p-5 my-8 shadow shadow-2xl rounded rounded-xl flex space-x-5 flex-col sm:flex-row"
+        class="md:w-5/6 h-64 mx-auto p-3 my-8 shadow shadow-2xl rounded rounded-xl flex space-x-5 flex-col sm:flex-row"
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="w-full sm:w-96 md:w-80 flex-none">
-          <img v-if="c.image" :src="c.image" alt="Category Image" />
+          <img
+            v-if="c.image"
+            :src="`https://restaurant-menu-gcvp.onrender.com/uploads/${c.image}`"
+            alt="Category Image"
+            class="w-full h-full object-cover"
+          />
           <img v-else src="@/assets/img/default-category.png" alt="Category Image" />
         </div>
-        <div class="flex-auto">
-          <div
-            class="flex items-start justify-between"
-            v-if="c.createdBy == authStore.userData.userId"
-          >
+        <div class="flex-auto p-2">
+          <div class="flex items-start justify-between">
             <h3 class="text-orange-700 text-2xl font-semibold">{{ c.title }}</h3>
-            <div class="flex">
+            <div class="flex" v-if="c.createdBy == authStore.userData.userId">
               <PencilIcon
                 class="button-edit"
                 @click="router.push(`/category/edit-category/${c._id}`)"

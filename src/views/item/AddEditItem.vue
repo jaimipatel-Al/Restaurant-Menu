@@ -1,44 +1,177 @@
 <script setup>
 import { ArrowPathIcon, ArrowUpTrayIcon, XMarkIcon } from '@heroicons/vue/24/solid'
-import { computed, ref } from 'vue'
-import { useRoute, RouterLink } from 'vue-router'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, RouterLink, useRouter } from 'vue-router'
 import { Form, Field } from 'vee-validate'
 import * as yup from 'yup'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
+import toast from '@/plugin/toast'
 
 const route = useRoute()
+const router = useRouter()
 const schema = yup.object({
   Title: yup.string().required().max(30),
   Description: yup.string().required().max(500),
+  Category: yup.string().required(),
+  Price: yup
+    .number()
+    .required()
+    .min(1)
+    .max(10000)
+    .typeError('Price must be a valid number')
+    .positive('Price must be greater than zero')
+    .test('decimal-check', 'Price can have up to two decimal places', (value) =>
+      /^\d+(\.\d{1,2})?$/.test(value?.toString() || '')
+    ),
+  Quantity: yup
+    .number()
+    .required()
+    .min(1)
+    .max(50)
+    .typeError('Quantity must be a valid number')
+    .positive('Quantity must be greater than zero')
+    .test('decimal-check', 'Quantity can have up to two decimal places', (value) =>
+      /^\d+(\.\d{1,2})?$/.test(value?.toString() || '')
+    ),
 })
 
 const id = computed(() => route?.params?.id)
 
+const categories = ref([])
 const title = ref('')
 const description = ref('')
+const category = ref()
+const price = ref()
+const quantity = ref()
 const file = ref()
+const image = ref()
 const imageUrl = ref()
 const isLoading = ref(false)
-
-const addItem = () => {
-  let formData
-
-  if (file.value) {
-    formData = new FormData()
-    formData.append('file', file.value)
-  }
-}
-const editItem = () => {}
+const isGetting = ref(false)
 
 const handleFileUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
+    image.value = file
     imageUrl.value = URL.createObjectURL(file)
   }
 }
 const removeImage = () => {
+  image.value = null
   imageUrl.value = null
   file.value.value = null
 }
+
+const getItemDetail = async () => {
+  isGetting.value = true
+
+  await Axios.get(`${api.getItem}${id.value}`)
+    .then(({ data }) => {
+      let res = data.data
+      title.value = res.title
+      description.value = res.description
+      imageUrl.value = res.image
+      category.value = res.categoryId._id
+      price.value = res.price
+      quantity.value = res.quantity
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      isGetting.value = false
+    })
+}
+const getCategories = async () => {
+  await Axios.get(api.listCategory)
+    .then(({ data }) => {
+      categories.value = data?.data
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+}
+const addItem = async () => {
+  isLoading.value = true
+
+  let formData
+  if (file.value) {
+    formData = new FormData()
+    formData.append('title', title.value)
+    formData.append('description', description.value)
+    formData.append('image', image.value)
+    formData.append('categoryId', category.value)
+    formData.append('price', price.value)
+    formData.append('quantity', quantity.value)
+  } else
+    formData = {
+      title: title.value,
+      description: description.value,
+      categoryId: category.value,
+      price: price.value,
+      quantity: quantity.value,
+    }
+
+  await Axios.post(api.createItem, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+    .then(() => {
+      toast.success('Item created successfully!!')
+      router.push('/item')
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+const editItem = async () => {
+  isLoading.value = true
+
+  let formData
+  if (file.value) {
+    formData = new FormData()
+    formData.append('title', title.value)
+    formData.append('description', description.value)
+    formData.append('image', image.value)
+    formData.append('categoryId', category.value)
+    formData.append('price', price.value)
+    formData.append('quantity', quantity.value)
+  } else
+    formData = {
+      title: title.value,
+      description: description.value,
+      categoryId: category.value,
+      price: price.value,
+      quantity: quantity.value,
+    }
+
+  await Axios.put(`${api.updateItem}${id.value}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+    .then(() => {
+      toast.success('Item updated successfully!!')
+      router.push('/item')
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+
+watch(
+  id,
+  () => {
+    if (id.value) getItemDetail()
+  },
+  { immediate: true }
+)
+
+onMounted(() => getCategories())
 </script>
 
 <template>
@@ -57,7 +190,7 @@ const removeImage = () => {
         <RouterLink to="/item" class="text-orange-600 underline">Back to Item list</RouterLink>
       </p>
       <Form
-        @submit="id ? editItem : addItem"
+        @submit="id ? editItem() : addItem()"
         :validation-schema="schema"
         v-slot="{ errors }"
         class="flex space-x-10"
@@ -103,10 +236,40 @@ const removeImage = () => {
           </div>
 
           <button type="submit" :disabled="isLoading">
-            {{ id ? 'Edit ' : 'Add ' }} Item <ArrowPathIcon v-if="isLoading" class="mx-3" />
+            {{ id ? 'Edit ' : 'Add ' }} Item <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
           </button>
         </div>
-        <div class="flex-1"></div>
+        <div class="flex-1">
+          <label for="category">Category</label>
+          <Field v-model="category" v-slot="{ field }" name="Category">
+            <select v-bind="field" id="category" class="input" placeholder="Enter Your Category">
+              <option v-for="c in categories" :key="c._id" :value="c._id">{{ c.title }}</option>
+            </select>
+          </Field>
+          <p class="error-message">{{ errors?.Category }}</p>
+
+          <label for="price">Price</label>
+          <Field
+            v-model="price"
+            type="number"
+            name="Price"
+            id="price"
+            class="input"
+            placeholder="Enter Your Price"
+          />
+          <p class="error-message">{{ errors?.Price }}</p>
+
+          <label for="quantity">Quantity</label>
+          <Field
+            v-model="quantity"
+            type="number"
+            name="Quantity"
+            id="quantity"
+            class="input"
+            placeholder="Enter Your Quantity"
+          />
+          <p class="error-message">{{ errors?.Quantity }}</p>
+        </div>
       </Form>
     </div>
   </main>
