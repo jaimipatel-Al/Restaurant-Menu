@@ -44,7 +44,7 @@ const deleteItem = async (data) => {
       getItems()
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
     })
     .finally(() => {
       data.isDeleting = false
@@ -85,18 +85,8 @@ onMounted(() => {
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="h-72">
-          <img
-            v-if="i.image"
-            :src="i.image"
-            alt="Item Image"
-            class="rounded rounded-xl w-full h-full object-cover"
-          />
-          <img
-            v-else
-            src="@/assets/img/default-item.jpg"
-            alt="Item Image"
-            class="rounded rounded-xl w-full h-full object-cover"
-          />
+          <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
+          <img v-else src="@/assets/img/default-item.jpg" alt="Item Image" class="uploaded-image" />
         </div>
         <div class="flex-between px-2">
           <h3 class="text-orange-700 text-2xl font-semibold">{{ i.title }}</h3>

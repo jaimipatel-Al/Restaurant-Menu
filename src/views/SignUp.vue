@@ -72,7 +72,7 @@ const signup = async () => {
   <main class="auth p-8">
     <div class="auth-box" style="height: 660px">
       <div class="auth-img-box">
-        <img src="@/assets/img/signup.jpg" alt="Sign Up" class="w-full h-full object-cover" />
+        <img src="@/assets/img/signup.jpg" alt="Sign Up" class="full-image" />
       </div>
       <div class="flex-1 p-10">
         <h1 class="auth-title">Sign Up</h1>

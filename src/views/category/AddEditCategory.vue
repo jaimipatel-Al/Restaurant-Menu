@@ -171,7 +171,7 @@ watch(
           <img
             :src="imageUrl"
             alt="Uploaded Image"
-            class="w-full h-full object-cover rounded-lg border border-gray-300"
+            class="full-image rounded-lg border border-gray-300"
           />
         </div>
 

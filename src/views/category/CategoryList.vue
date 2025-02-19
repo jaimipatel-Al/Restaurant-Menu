@@ -44,7 +44,7 @@ const deleteCategory = async (data) => {
       getCategories()
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
     })
     .finally(() => {
       data.isDeleting = false
@@ -76,12 +76,7 @@ onMounted(() => {
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="w-full sm:w-96 md:w-80 flex-none">
-          <img
-            v-if="c.image"
-            :src="c.image"
-            alt="Category Image"
-            class="w-full h-full object-cover"
-          />
+          <img v-if="c.image" :src="c.image" alt="Category Image" class="full-image" />
           <img v-else src="@/assets/img/default-category.png" alt="Category Image" />
         </div>
         <div class="flex-auto p-2">

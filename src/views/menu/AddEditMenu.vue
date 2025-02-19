@@ -86,7 +86,6 @@ const addMenu = async () => {
     formData.append('name', title.value)
     formData.append('price', price.value)
     formData.append('isTodayMenu', isTodayMenu.value)
-    formData.append('isActive', isActive.value)
     formData.append('image', image.value)
     selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
   } else
@@ -94,7 +93,6 @@ const addMenu = async () => {
       name: title.value,
       price: price.value,
       isTodayMenu: isTodayMenu.value,
-      isActive: isActive.value,
       subCategories: selectedItem.value.map((e) => e._id),
     }
 
@@ -232,7 +230,7 @@ onMounted(() => {
             />
             Is Add on Today's Menu?
           </label>
-          <label v-if="!isGetting" for="active" class="flex items-center space-x-3 mb-5">
+          <label v-if="!isGetting && id" for="active" class="flex items-center space-x-3 mb-5">
             <input v-model="isActive" type="checkbox" id="active" class="w-4 h-4 cursor-pointer" />
             Available
           </label>
@@ -250,7 +248,7 @@ onMounted(() => {
             <img
               :src="imageUrl"
               alt="Uploaded Image"
-              class="w-full h-full object-cover rounded-lg border border-gray-300"
+              class="full-image rounded-lg border border-gray-300"
             />
           </div>
 
@@ -283,17 +281,12 @@ onMounted(() => {
               class="w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full absolute -top-2 -right-2 text-white"
             />
             <div class="h-40">
-              <img
-                v-if="i.image"
-                :src="i.image"
-                alt="Item Image"
-                class="rounded rounded-xl w-full h-full object-cover"
-              />
+              <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
               <img
                 v-else
                 src="@/assets/img/default-item.jpg"
                 alt="Item Image"
-                class="rounded rounded-xl w-full h-full object-cover"
+                class="uploaded-image"
               />
             </div>
             <div class="p-2 font-bold">

@@ -127,7 +127,7 @@ onMounted(() => {
         </Form>
       </div>
       <div class="auth-img-box">
-        <img src="@/assets/img/login.jpg" alt="Login" class="w-full h-full object-cover" />
+        <img src="@/assets/img/login.jpg" alt="Login" class="full-image" />
       </div>
     </div>
   </main>

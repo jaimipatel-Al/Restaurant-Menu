@@ -44,7 +44,7 @@ const deleteMenu = async (data) => {
       getMenu()
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
     })
     .finally(() => {
       data.isDeleting = false
@@ -102,13 +102,8 @@ onMounted(() => {
             i % 2 == 1 ? 'col-start-3 col-end-4  flex-none' : ''
           }`"
         >
-          <img v-if="m.image" :src="m.image" alt="Menu Image" class="w-full h-full object-cover" />
-          <img
-            v-else
-            src="@/assets/img/default-menu.jpg"
-            class="w-full h-full object-cover"
-            alt="Menu Image"
-          />
+          <img v-if="m.image" :src="m.image" alt="Menu Image" class="full-image" />
+          <img v-else src="@/assets/img/default-menu.jpg" class="full-image" alt="Menu Image" />
         </div>
         <div
           :class="`flex-auto p-5 ${
@@ -163,17 +158,12 @@ onMounted(() => {
               @click="addItem(i)"
             >
               <div class="h-40">
-                <img
-                  v-if="i.image"
-                  :src="i.image"
-                  alt="Item Image"
-                  class="rounded rounded-xl w-full h-full object-cover"
-                />
+                <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
                 <img
                   v-else
                   src="@/assets/img/default-item.jpg"
                   alt="Item Image"
-                  class="rounded rounded-xl w-full h-full object-cover"
+                  class="uploaded-image"
                 />
               </div>
               <div class="p-2 font-bold">

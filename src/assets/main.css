@@ -90,6 +90,14 @@
     .no-data {
         @apply flex justify-center font-bold text-gray-900 text-3xl p-10
     }
+
+    .full-image {
+        @apply w-full h-full object-cover
+    }
+
+    .uploaded-image {
+        @apply rounded rounded-xl full-image
+    }
 }
 
 .auth {
