@@ -57,19 +57,25 @@ const router = createRouter({
     },
 
     {
-      path: '/menu',
-      name: 'Menu',
-      component: () => import('../views/menu/MenuList.vue'),
+      path: '/combo',
+      name: 'Combo',
+      component: () => import('../views/combo/ComboList.vue'),
     },
     {
-      path: '/menu/add-menu',
-      name: 'AddMenu',
-      component: () => import('../views/menu/AddEditMenu.vue'),
+      path: '/combo/add-combo',
+      name: 'AddCombo',
+      component: () => import('../views/combo/AddEditCombo.vue'),
     },
     {
-      path: '/menu/edit-menu/:id',
-      name: 'EditMenu',
-      component: () => import('../views/menu/AddEditMenu.vue'),
+      path: '/combo/edit-combo/:id',
+      name: 'EditCombo',
+      component: () => import('../views/combo/AddEditCombo.vue'),
+    },
+
+    {
+      path: '/cart',
+      name: 'Cart',
+      component: () => import('../views/FoodCart.vue'),
     },
   ],
 })

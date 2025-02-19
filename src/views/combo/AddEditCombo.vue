@@ -77,7 +77,7 @@ const getItems = async () => {
       isItemLoading.value = false
     })
 }
-const addMenu = async () => {
+const addCombo = async () => {
   isLoading.value = true
 
   let formData
@@ -96,12 +96,12 @@ const addMenu = async () => {
       subCategories: selectedItem.value.map((e) => e._id),
     }
 
-  await Axios.post(api.createMenu, formData, {
+  await Axios.post(api.createCombo, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
     .then(() => {
-      toast.success('Menu created successfully!!')
-      router.push('/menu')
+      toast.success('Combo created successfully!!')
+      router.push('/combo')
     })
     .catch((er) => {
       toast.error(er?.response?.data?.message)
@@ -110,7 +110,7 @@ const addMenu = async () => {
       isLoading.value = false
     })
 }
-const editMenu = async () => {
+const editCombo = async () => {
   isLoading.value = true
 
   let formData
@@ -131,12 +131,12 @@ const editMenu = async () => {
       subCategories: selectedItem.value.map((e) => e._id),
     }
 
-  await Axios.put(`${api.updateMenu}${id.value}`, formData, {
+  await Axios.put(`${api.updateCombo}${id.value}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
     .then(() => {
-      toast.success('Menu updated successfully!!')
-      router.push('/menu')
+      toast.success('Combo updated successfully!!')
+      router.push('/combo')
     })
     .catch((er) => {
       toast.error(er?.response?.data?.message)
@@ -145,10 +145,10 @@ const editMenu = async () => {
       isLoading.value = false
     })
 }
-const getMenuDetail = async () => {
+const getComboDetail = async () => {
   isGetting.value = true
 
-  await Axios.get(`${api.getMenu}${id.value}`)
+  await Axios.get(`${api.getCombo}${id.value}`)
     .then(({ data }) => {
       let res = data.data
       title.value = res.name
@@ -169,7 +169,7 @@ const getMenuDetail = async () => {
 watch(
   id,
   () => {
-    if (id.value) getMenuDetail()
+    if (id.value) getComboDetail()
   },
   { immediate: true }
 )
@@ -186,12 +186,16 @@ onMounted(() => {
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
       <div class="w-96 flex-none">
-        <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Menu</h1>
+        <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Combo</h1>
         <p class="auth-detail">
           Make Combo, A perfect mix of tasty snacks and hearty meals.
-          <RouterLink to="/menu" class="text-orange-600 underline">Back to Menu list</RouterLink>
+          <RouterLink to="/combo" class="text-orange-600 underline">Back to Combo list</RouterLink>
         </p>
-        <Form @submit="id ? editMenu() : addMenu()" :validation-schema="schema" v-slot="{ errors }">
+        <Form
+          @submit="id ? editCombo() : addCombo()"
+          :validation-schema="schema"
+          v-slot="{ errors }"
+        >
           <label for="title">Title</label>
           <p v-if="isGetting" class="bg-gray-300 mb-4 h-14 w-full rounded-md animate-pulse"></p>
           <Field
@@ -221,14 +225,14 @@ onMounted(() => {
           </p>
           <p v-if="!isGetting" class="error-message">{{ errors?.Price }}</p>
 
-          <label v-if="!isGetting" for="today-menu" class="flex items-center space-x-3">
+          <label v-if="!isGetting" for="today-combo" class="flex items-center space-x-3">
             <input
               v-model="isTodayMenu"
               type="checkbox"
-              id="today-menu"
+              id="today-combo"
               class="w-4 h-4 cursor-pointer"
             />
-            Is Add on Today's Menu?
+            Is Add on Today's Special Combo?
           </label>
           <label v-if="!isGetting && id" for="active" class="flex items-center space-x-3 mb-5">
             <input v-model="isActive" type="checkbox" id="active" class="w-4 h-4 cursor-pointer" />
@@ -253,7 +257,7 @@ onMounted(() => {
           </div>
 
           <button type="submit" :disabled="isLoading || isGetting">
-            {{ id ? 'Edit ' : 'Add ' }} Menu <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
+            {{ id ? 'Edit ' : 'Add ' }} Combo <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
           </button>
         </Form>
       </div>
@@ -302,7 +306,7 @@ onMounted(() => {
 
 <style scoped>
 section {
-  background-image: url('@/assets/img/add-menu-bg.jpg');
+  background-image: url('@/assets/img/add-combo-bg.jpg');
 }
 .active-item {
   background: rgb(255 176 176) !important;

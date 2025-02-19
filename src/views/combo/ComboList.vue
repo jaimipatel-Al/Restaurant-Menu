@@ -17,14 +17,14 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const isLoading = ref(false)
-const menus = ref([])
+const combos = ref([])
 
-const getMenu = async () => {
+const getCombo = async () => {
   isLoading.value = true
 
-  await Axios.get(api.listMenu)
+  await Axios.get(api.listCombo)
     .then(({ data }) => {
-      menus.value = data?.data?.map((e) => {
+      combos.value = data?.data?.map((e) => {
         return { ...e, isDeleting: false }
       })
     })
@@ -35,13 +35,13 @@ const getMenu = async () => {
       isLoading.value = false
     })
 }
-const deleteMenu = async (data) => {
+const deleteCombo = async (data) => {
   data.isDeleting = true
 
-  await Axios.delete(`${api.deleteMenu}${data._id}`)
+  await Axios.delete(`${api.deleteCombo}${data._id}`)
     .then(() => {
-      toast.success('Menu deleted successfully!!')
-      getMenu()
+      toast.success('Combo deleted successfully!!')
+      getCombo()
     })
     .catch((er) => {
       toast.error(er?.response?.data?.message)
@@ -50,20 +50,20 @@ const deleteMenu = async (data) => {
       data.isDeleting = false
     })
 }
-const availableMenu = async (data) => {
-  await Axios.patch(`${api.toggleMenuAvailability}${data._id}`)
+const availableCombo = async (data) => {
+  await Axios.patch(`${api.toggleComboAvailability}${data._id}`)
     .then(() => {
-      toast.success('Menu Availability Changed successfully!!')
+      toast.success('Combo Availability Changed successfully!!')
     })
     .catch((er) => {
       console.log(er)
     })
 }
-const todayMenu = async (data) => {
+const todayCombo = async (data) => {
   await Axios.post(`${api.selectToday}${data._id}`)
     .then(() => {
-      toast.success("Menu's Today's Special Option Changed successfully!!")
-      getMenu()
+      toast.success("Combo's Today's Special Option Changed successfully!!")
+      getCombo()
       isLoading.value = false
     })
     .catch((er) => {
@@ -72,25 +72,25 @@ const todayMenu = async (data) => {
 }
 
 onMounted(() => {
-  getMenu()
+  getCombo()
 })
 </script>
 
 <template>
   <section class="w-screen h-screen bg-cover">
     <div class="flex-between px-8 py-5">
-      <h1 class="auth-title">Menu</h1>
-      <RouterLink to="/menu/add-menu" class="button flex items-center"
-        ><PlusIcon class="w-12 mr-2" /> Add Menu</RouterLink
+      <h1 class="auth-title">Combo</h1>
+      <RouterLink to="/combo/add-combo" class="button flex items-center"
+        ><PlusIcon class="w-12 mr-2" /> Add Combo</RouterLink
       >
     </div>
     <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-12 mx-3" /> Loading...</div>
-    <div v-else-if="menus?.length == 0" class="no-data">
-      <NoSymbolIcon class="w-12 mx-3" /> No Menu Available
+    <div v-else-if="combos?.length == 0" class="no-data">
+      <NoSymbolIcon class="w-12 mx-3" /> No Combo Available
     </div>
     <div v-else class="h-5/6 overflow-y-auto">
       <div
-        v-for="(m, i) in menus"
+        v-for="(m, i) in combos"
         :key="m._id"
         class="grid grid-cols-3 grid-rows-3 grid-container p-10 shadow shadow-2xl"
         :style="`background: ${
@@ -102,8 +102,8 @@ onMounted(() => {
             i % 2 == 1 ? 'col-start-3 col-end-4  flex-none' : ''
           }`"
         >
-          <img v-if="m.image" :src="m.image" alt="Menu Image" class="full-image" />
-          <img v-else src="@/assets/img/default-menu.jpg" class="full-image" alt="Menu Image" />
+          <img v-if="m.image" :src="m.image" alt="Combo Image" class="full-image" />
+          <img v-else src="@/assets/img/default-combo.jpg" class="full-image" alt="Combo Image" />
         </div>
         <div
           :class="`flex-auto p-5 ${
@@ -113,8 +113,8 @@ onMounted(() => {
           <div class="flex items-start justify-between">
             <h3 class="text-orange-700 text-3xl font-bold">{{ m.name }}</h3>
             <div class="flex" v-if="m.createdBy == authStore.userData.userId">
-              <PencilIcon class="button-edit" @click="router.push(`/menu/edit-menu/${m._id}`)" />
-              <TrashIcon v-if="!m.isDeleting" class="button-delete" @click="deleteMenu(m)" />
+              <PencilIcon class="button-edit" @click="router.push(`/combo/edit-combo/${m._id}`)" />
+              <TrashIcon v-if="!m.isDeleting" class="button-delete" @click="deleteCombo(m)" />
               <ArrowPathIcon v-else class="button-delete" />
             </div>
           </div>
@@ -126,19 +126,19 @@ onMounted(() => {
                 type="checkbox"
                 :id="`available-${m._id}`"
                 class="w-6 h-6 cursor-pointer mr-2"
-                @change="availableMenu(m)"
+                @change="availableCombo(m)"
               />
               Available
             </label>
-            <label :for="`today-menu-${m._id}`" class="flex items-center font-semibold text-xl">
+            <label :for="`today-combo-${m._id}`" class="flex items-center font-semibold text-xl">
               <input
                 v-model="m.isTodayMenu"
                 type="checkbox"
-                :id="`today-menu-${m._id}`"
+                :id="`today-combo-${m._id}`"
                 class="w-6 h-6 cursor-pointer mr-2"
-                @change="todayMenu(m)"
+                @change="todayCombo(m)"
               />
-              Is Add on Today's Menu?
+              Is Add on Today's Special Combo?
             </label>
           </div>
         </div>
@@ -180,6 +180,6 @@ onMounted(() => {
 
 <style scoped>
 section {
-  background-image: url('@/assets/img/menu-bg.jpg');
+  background-image: url('@/assets/img/combo-bg.jpg');
 }
 </style>

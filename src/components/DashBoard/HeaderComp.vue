@@ -25,11 +25,14 @@ const logout = () => {
     <nav class="flex justify-end items-center text-xl font-semibold space-x-5 mx-10">
       <template v-if="authStore?.userData?.userId">
         <RouterLink to="/" class="router-link">Home</RouterLink>
-        <RouterLink to="/menu" class="router-link">Menu</RouterLink>
-        <RouterLink to="/category" class="router-link">Categories</RouterLink>
+        <RouterLink to="/combo" class="router-link">Combo</RouterLink>
+        <RouterLink to="/category" class="router-link">Category</RouterLink>
         <RouterLink to="/item" class="router-link">Item</RouterLink>
         <span class="router-link" @click="logout()">Logout</span>
-        <div class="relative cursor-pointer hover:bg-orange-50 rounded-full">
+        <div
+          class="relative cursor-pointer hover:bg-orange-50 rounded-full"
+          @click="router.push('/cart')"
+        >
           <ShoppingCartIcon class="w-14 p-2" />
           <span
             class="absolute py-0.5 px-2 text-sm bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"

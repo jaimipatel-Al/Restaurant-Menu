@@ -91,7 +91,7 @@ onMounted(() => {
               <ArrowPathIcon v-else class="button-delete" />
             </div>
           </div>
-          <RouterLink :to="`/item/${c._id}`" class="text-orange-400 text-sm">Show Items</RouterLink>
+          <RouterLink :to="`/item`" class="text-orange-400 text-sm">Show Items</RouterLink>
           <p class="auth-detail">{{ c.description }}</p>
         </div>
       </div>

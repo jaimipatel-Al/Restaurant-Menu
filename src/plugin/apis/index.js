@@ -15,12 +15,12 @@ const requests = {
   updateItem: 'subcategories/update-subcategories/',
   toggleItemAvailability: 'subcategories/toggle-subcategory-status/',
 
-  listMenu: 'menu/get-all-menu',
-  getMenu: 'menu/get-menu-details/',
-  deleteMenu: 'menu/delete-menu/',
-  createMenu: 'menu/create-menu',
-  updateMenu: 'menu/update-menu/',
-  toggleMenuAvailability: 'menu/toggle-menu-status/',
+  listCombo: 'menu/get-all-menu',
+  getCombo: 'menu/get-menu-details/',
+  deleteCombo: 'menu/delete-menu/',
+  createCombo: 'menu/create-menu',
+  updateCombo: 'menu/update-menu/',
+  toggleComboAvailability: 'menu/toggle-menu-status/',
   selectToday: 'menu/select-today/',
 }
 
