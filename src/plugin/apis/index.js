@@ -22,6 +22,11 @@ const requests = {
   updateCombo: 'menu/update-menu/',
   toggleComboAvailability: 'menu/toggle-menu-status/',
   selectToday: 'menu/select-today/',
+
+  restaurantList: 'auth/owners',
+
+  customerMenu: `customer/menu/`,
+  customerItems: `customer/items/`,
 }
 
 export default requests
