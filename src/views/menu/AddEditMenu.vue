@@ -1,0 +1,309 @@
+<script setup>
+import { ArrowPathIcon, ArrowUpTrayIcon, XMarkIcon, NoSymbolIcon } from '@heroicons/vue/24/solid'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, RouterLink, useRouter } from 'vue-router'
+import { Form, Field } from 'vee-validate'
+import * as yup from 'yup'
+import Axios from '@/plugin/axios'
+import api from '@/plugin/apis'
+import toast from '@/plugin/toast'
+
+const route = useRoute()
+const router = useRouter()
+const schema = yup.object({
+  Title: yup.string().required().max(30),
+  Price: yup
+    .number()
+    .required()
+    .min(1)
+    .max(10000)
+    .typeError('Price must be a valid number')
+    .positive('Price must be greater than zero')
+    .test('decimal-check', 'Price can have up to two decimal places', (value) =>
+      /^\d+(\.\d{1,2})?$/.test(value?.toString() || '')
+    ),
+})
+
+const id = computed(() => route?.params?.id)
+
+const items = ref([])
+const selectedItem = ref([])
+const title = ref('')
+const price = ref()
+const isTodayMenu = ref(false)
+const file = ref()
+const image = ref()
+const imageUrl = ref()
+const isLoading = ref(false)
+const isItemLoading = ref(false)
+const isGetting = ref(false)
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    image.value = file
+    imageUrl.value = URL.createObjectURL(file)
+  }
+}
+const removeImage = () => {
+  imageUrl.value = null
+  image.value = null
+  file.value.value = null
+}
+
+// -------------------------------------------------------------------------------------
+
+const totalPrice = computed(() => {
+  if (selectedItem.value?.length) return selectedItem.value.reduce((e, item) => e + item.price, 0)
+  return 0
+})
+const addItem = (i) => {
+  if (selectedItem.value.find((e) => e._id == i._id)) {
+    let arr = selectedItem.value.filter((e) => e._id !== i._id)
+    selectedItem.value = [...arr]
+  } else selectedItem.value.push(i)
+}
+
+const getItems = async () => {
+  isItemLoading.value = true
+
+  await Axios.get(api.listItem)
+    .then(({ data }) => {
+      items.value = data?.data
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      isItemLoading.value = false
+    })
+}
+const addMenu = async () => {
+  isLoading.value = true
+
+  let formData
+  // if (imageUrl.value) {
+  //   formData = new FormData()
+  //   formData.append('name', title.value)
+  //   formData.append('price', price.value)
+  //   formData.append('image', image.value)
+  //   formData.append('isTodayMenu', isTodayMenu.value)
+  //   selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
+  // } else
+  formData = {
+    name: title.value,
+    price: price.value,
+    isTodayMenu: isTodayMenu.value,
+    subCategories: selectedItem.value.map((e) => {
+      return { subCategoryId: e._id }
+    }),
+  }
+
+  await Axios.post(api.createMenu, formData, {
+    // headers: { 'Content-Type': 'multipart/form-data' },
+  })
+    .then(() => {
+      toast.success('Menu created successfully!!')
+      router.push('/menu')
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+const editMenu = async () => {
+  isLoading.value = true
+
+  let formData
+  if (file.value) {
+    formData = new FormData()
+    formData.append('name', title.value)
+    formData.append('price', price.value)
+    formData.append('image', image.value)
+    formData.append('isTodayMenu', isTodayMenu.value)
+    selectedItem.value.forEach((e, i) => formData.append(`subCategoryId[${i}]`, e._id))
+  } else
+    formData = {
+      name: title.value,
+      price: price.value,
+      isTodayMenu: isTodayMenu.value,
+      subCategoryId: selectedItem.value.map((e) => e._id),
+    }
+
+  await Axios.put(`${api.updateMenu}${id.value}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+    .then(() => {
+      toast.success('Menu updated successfully!!')
+      router.push('/menu')
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message)
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
+}
+const getMenuDetail = async () => {
+  isGetting.value = true
+
+  await Axios.get(`${api.getMenu}${id.value}`)
+    .then(({ data }) => {
+      let res = data.data
+      title.value = res.name
+      price.value = res.price
+      isTodayMenu.value = res.isTodayMenu
+      imageUrl.value = res.image
+      // selectedItem
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+    .finally(() => {
+      isGetting.value = false
+    })
+}
+
+watch(
+  id,
+  () => {
+    if (id.value) getMenuDetail()
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  getItems()
+})
+</script>
+
+<template>
+  <section class="w-screen h-screen bg-cover flex items-center justify-end add-edit-form">
+    <div
+      class="w-full h-5/6 shadow shadow-2xl m-10 p-8 flex"
+      style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
+    >
+      <div class="w-96 flex-none">
+        <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Menu</h1>
+        <p class="auth-detail">
+          Make Combo, A perfect mix of tasty snacks and hearty meals.
+          <RouterLink to="/menu" class="text-orange-600 underline">Back to Menu list</RouterLink>
+        </p>
+        <Form @submit="id ? editMenu() : addMenu()" :validation-schema="schema" v-slot="{ errors }">
+          <label for="title">Title</label>
+          <p v-if="isGetting" class="bg-gray-300 mb-4 h-14 w-full rounded-md animate-pulse"></p>
+          <Field
+            v-if="!isGetting"
+            v-model="title"
+            type="text"
+            name="Title"
+            id="title"
+            class="input"
+            placeholder="Enter Your Title"
+          />
+          <p v-if="!isGetting" class="error-message">{{ errors?.Title }}</p>
+
+          <label for="price">Price</label>
+          <Field
+            v-model="price"
+            type="number"
+            name="Price"
+            id="price"
+            class="input"
+            placeholder="Enter Your Price"
+          />
+          <p v-if="selectedItem?.length" class="text-green-700 text-sm font-semibold">
+            Total price of selected item : {{ totalPrice }}
+          </p>
+          <p class="error-message">{{ errors?.Price }}</p>
+
+          <label for="remember" class="flex items-center space-x-3 mb-5 pt-3">
+            <input
+              v-model="isTodayMenu"
+              type="checkbox"
+              id="remember"
+              class="w-4 h-4 cursor-pointer"
+            />
+            Is Add on Today's Menu?
+          </label>
+
+          <label v-if="!isGetting" for="image" style="display: flex" class="items-center">
+            Upload Image
+            <ArrowUpTrayIcon class="upload-button mx-2" v-if="!imageUrl" @click="file.click()" />
+            <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
+          </label>
+          <div v-if="imageUrl && !isGetting" class="relative mt-4 w-24 h-24">
+            <XMarkIcon
+              class="absolute w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full -top-2 -right-2 text-white"
+              @click="removeImage()"
+            />
+            <img
+              :src="imageUrl"
+              alt="Uploaded Image"
+              class="w-full h-full object-cover rounded-lg border border-gray-300"
+            />
+          </div>
+
+          <button type="submit" :disabled="isLoading || isGetting">
+            {{ id ? 'Edit ' : 'Add ' }} Menu <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
+          </button>
+        </Form>
+      </div>
+      <div class="ml-3 w-full">
+        <div v-if="isItemLoading" class="no-data">
+          <ArrowPathIcon class="w-6 mx-3" /> Loading...
+        </div>
+        <div v-else-if="items?.length == 0" class="no-data">
+          <NoSymbolIcon class="w-12 mx-3" /> No Item Available
+          <RouterLink to="/item/add-item" class="text-orange-600 underline ml-2">
+            Add items</RouterLink
+          >
+        </div>
+        <div v-else class="flex flex-wrap items-start justify-start overflow-y-auto h-full">
+          <div
+            v-for="i in items"
+            :key="i"
+            class="p-2 shadow shadow-2xl rounded rounded-xl w-56 m-2 cursor-pointer"
+            style="background: rgb(255, 255, 255, 0.8)"
+            :class="{ 'active-item relative': selectedItem.find((e) => e?._id == i?._id) }"
+            @click="addItem(i)"
+          >
+            <XMarkIcon
+              v-if="selectedItem.find((e) => e?._id == i?._id)"
+              class="w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full absolute -top-2 -right-2 text-white"
+            />
+            <div class="h-40">
+              <img
+                v-if="i.image"
+                :src="i.image"
+                alt="Item Image"
+                class="rounded rounded-xl w-full h-full object-cover"
+              />
+              <img
+                v-else
+                src="@/assets/img/default-item.jpg"
+                alt="Item Image"
+                class="rounded rounded-xl w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-2 font-bold">
+              <p class="text-orange-600 text-lg">{{ i.title }}</p>
+              <p class="text-blue-700 text-sm">₹ {{ i.price }} /-</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+section {
+  background-image: url('@/assets/img/add-menu-bg.jpg');
+}
+.active-item {
+  background: rgb(255 176 176) !important;
+}
+</style>

@@ -55,6 +55,22 @@ const router = createRouter({
       name: 'EditCategory',
       component: () => import('../views/category/AddEditCategory.vue'),
     },
+
+    {
+      path: '/menu',
+      name: 'Menu',
+      component: () => import('../views/menu/MenuList.vue'),
+    },
+    {
+      path: '/menu/add-menu',
+      name: 'AddMenu',
+      component: () => import('../views/menu/AddEditMenu.vue'),
+    },
+    {
+      path: '/menu/edit-menu/:id',
+      name: 'EditMenu',
+      component: () => import('../views/menu/AddEditMenu.vue'),
+    },
   ],
 })
 
