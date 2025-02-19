@@ -29,7 +29,7 @@ const getCombo = async () => {
       })
     })
     .catch((er) => {
-      console.log(er)
+      console.error(er?.response?.data?.message)
     })
     .finally(() => {
       isLoading.value = false
@@ -56,7 +56,7 @@ const availableCombo = async (data) => {
       toast.success('Combo Availability Changed successfully!!')
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
     })
 }
 const todayCombo = async (data) => {
@@ -67,7 +67,7 @@ const todayCombo = async (data) => {
       isLoading.value = false
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
     })
 }
 

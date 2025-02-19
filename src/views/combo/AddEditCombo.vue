@@ -71,7 +71,7 @@ const getItems = async () => {
       items.value = data?.data
     })
     .catch((er) => {
-      console.log(er)
+      console.error(er?.response?.data?.message)
     })
     .finally(() => {
       isItemLoading.value = false
@@ -159,7 +159,8 @@ const getComboDetail = async () => {
       selectedItem.value = res.subCategories
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
+      router.push('/combo')
     })
     .finally(() => {
       isGetting.value = false

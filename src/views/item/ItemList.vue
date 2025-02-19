@@ -29,7 +29,7 @@ const getItems = async () => {
       })
     })
     .catch((er) => {
-      console.log(er)
+      console.error(er?.response?.data?.message)
     })
     .finally(() => {
       isLoading.value = false
@@ -56,7 +56,7 @@ const availableItem = async (data) => {
       toast.success('Item Availability Changed successfully!!')
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
     })
 }
 

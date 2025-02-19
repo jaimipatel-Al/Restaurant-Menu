@@ -69,7 +69,7 @@ const signup = async () => {
 </script>
 
 <template>
-  <main class="auth p-8">
+  <main class="auth flex items-center">
     <div class="auth-box" style="height: 660px">
       <div class="auth-img-box">
         <img src="@/assets/img/signup.jpg" alt="Sign Up" class="full-image" />

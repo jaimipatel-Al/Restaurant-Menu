@@ -49,7 +49,8 @@ const getCategoryDetail = async () => {
       imageUrl.value = res.image
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
+      router.push('/category')
     })
     .finally(() => {
       isGetting.value = false

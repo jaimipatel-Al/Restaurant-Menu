@@ -71,7 +71,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="auth p-10">
+  <main class="auth flex items-center">
     <div class="auth-box" style="height: 600px">
       <div class="flex-1 p-10">
         <h1 class="auth-title">Login</h1>

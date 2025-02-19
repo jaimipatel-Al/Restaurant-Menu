@@ -29,7 +29,7 @@ const getCategories = async () => {
       })
     })
     .catch((er) => {
-      console.log(er)
+      console.error(er?.response?.data?.message)
     })
     .finally(() => {
       isLoading.value = false

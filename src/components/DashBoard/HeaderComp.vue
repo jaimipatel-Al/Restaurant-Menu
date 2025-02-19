@@ -23,8 +23,9 @@ const logout = () => {
       </h1>
     </div>
     <nav class="flex justify-end items-center text-xl font-semibold space-x-5 mx-10">
+      <RouterLink to="/" class="router-link">Home</RouterLink>
       <template v-if="authStore?.userData?.userId">
-        <RouterLink to="/" class="router-link">Home</RouterLink>
+        <RouterLink to="/restaurant" class="router-link">Restaurant</RouterLink>
         <RouterLink to="/combo" class="router-link">Combo</RouterLink>
         <RouterLink to="/category" class="router-link">Category</RouterLink>
         <RouterLink to="/item" class="router-link">Item</RouterLink>

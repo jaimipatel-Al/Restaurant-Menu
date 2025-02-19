@@ -92,7 +92,8 @@ const getItemDetail = async () => {
       isActive.value = res.isActive
     })
     .catch((er) => {
-      console.log(er)
+      toast.error(er?.response?.data?.message)
+      router.push('/item')
     })
     .finally(() => {
       isGetting.value = false
@@ -105,7 +106,7 @@ const getCategories = async () => {
       if (!categories.value?.length) showAlert()
     })
     .catch((er) => {
-      console.log(er)
+      console.error(er?.response?.data?.message)
     })
 }
 const addItem = async () => {
@@ -215,7 +216,12 @@ onMounted(() => getCategories())
       >
         <div class="flex-1">
           <label for="title">Title</label>
+          <p
+            v-if="isGetting"
+            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
+          ></p>
           <Field
+            v-if="!isGetting"
             v-model="title"
             type="text"
             name="Title"
@@ -223,10 +229,14 @@ onMounted(() => getCategories())
             class="input"
             placeholder="Enter Your Title"
           />
-          <p class="error-message">{{ errors?.Title }}</p>
+          <p v-if="!isGetting" class="error-message">{{ errors?.Title }}</p>
 
           <label for="description">Description</label>
-          <Field v-model="description" v-slot="{ field }" name="Description">
+          <p
+            v-if="isGetting"
+            class="bg-gray-300 mb-3 mt-1 h-40 w-full rounded-md animate-pulse"
+          ></p>
+          <Field v-if="!isGetting" v-model="description" v-slot="{ field }" name="Description">
             <textarea
               v-bind="field"
               id="description"
@@ -234,9 +244,9 @@ onMounted(() => getCategories())
               placeholder="Enter Your Description"
             ></textarea>
           </Field>
-          <p class="error-message">{{ errors?.Description }}</p>
+          <p v-if="!isGetting" class="error-message">{{ errors?.Description }}</p>
 
-          <label for="image" style="display: flex" class="items-center">
+          <label v-if="!isGetting" for="image" style="display: flex" class="items-center">
             Upload Image
             <ArrowUpTrayIcon class="upload-button mx-2" v-if="!imageUrl" @click="file.click()" />
             <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
@@ -259,15 +269,24 @@ onMounted(() => getCategories())
         </div>
         <div class="flex-1">
           <label for="category">Category</label>
-          <Field v-model="category" v-slot="{ field }" name="Category">
+          <p
+            v-if="isGetting"
+            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
+          ></p>
+          <Field v-if="!isGetting" v-model="category" v-slot="{ field }" name="Category">
             <select v-bind="field" id="category" class="input" placeholder="Enter Your Category">
               <option v-for="c in categories" :key="c._id" :value="c._id">{{ c.title }}</option>
             </select>
           </Field>
-          <p class="error-message">{{ errors?.Category }}</p>
+          <p v-if="!isGetting" class="error-message">{{ errors?.Category }}</p>
 
           <label for="price">Price</label>
+          <p
+            v-if="isGetting"
+            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
+          ></p>
           <Field
+            v-if="!isGetting"
             v-model="price"
             type="number"
             name="Price"
@@ -275,10 +294,15 @@ onMounted(() => getCategories())
             class="input"
             placeholder="Enter Your Price"
           />
-          <p class="error-message">{{ errors?.Price }}</p>
+          <p v-if="!isGetting" class="error-message">{{ errors?.Price }}</p>
 
           <label for="quantity">Quantity</label>
+          <p
+            v-if="isGetting"
+            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
+          ></p>
           <Field
+            v-if="!isGetting"
             v-model="quantity"
             type="number"
             name="Quantity"
@@ -286,9 +310,9 @@ onMounted(() => getCategories())
             class="input"
             placeholder="Enter Your Quantity"
           />
-          <p class="error-message">{{ errors?.Quantity }}</p>
+          <p v-if="!isGetting" class="error-message">{{ errors?.Quantity }}</p>
 
-          <label v-if="id" for="available" class="flex items-center font-semibold">
+          <label v-if="id && !isGetting" for="available" class="flex items-center font-semibold">
             <input
               v-model="isActive"
               type="checkbox"
