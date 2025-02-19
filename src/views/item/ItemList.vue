@@ -57,7 +57,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="w-screen h-screen bg-cover">
+  <section class="w-screen h-screen bg-cover">
     <div class="flex-between p-8">
       <h1 class="auth-title">Items</h1>
       <RouterLink to="/item/add-item" class="button flex items-center"
@@ -78,7 +78,7 @@ onMounted(() => {
         <div class="h-72">
           <img
             v-if="i.image"
-            :src="`https://restaurant-menu-gcvp.onrender.com/uploads/${i.image}`"
+            :src="i.image"
             alt="Item Image"
             class="rounded rounded-xl w-full h-full object-cover"
           />
@@ -109,11 +109,11 @@ onMounted(() => {
         </div>
       </div>
     </div>
-  </main>
+  </section>
 </template>
 
 <style scoped>
-main {
+section {
   background-image: url('@/assets/img/item-bg.jpg');
 }
 </style>

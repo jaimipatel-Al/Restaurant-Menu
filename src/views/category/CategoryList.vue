@@ -57,7 +57,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="w-screen h-screen bg-cover">
+  <section class="w-screen h-screen bg-cover">
     <div class="flex-between p-8">
       <h1 class="auth-title">Category</h1>
       <RouterLink to="/category/add-category" class="button flex items-center"
@@ -78,7 +78,7 @@ onMounted(() => {
         <div class="w-full sm:w-96 md:w-80 flex-none">
           <img
             v-if="c.image"
-            :src="`https://restaurant-menu-gcvp.onrender.com/uploads/${c.image}`"
+            :src="c.image"
             alt="Category Image"
             class="w-full h-full object-cover"
           />
@@ -101,11 +101,11 @@ onMounted(() => {
         </div>
       </div>
     </div>
-  </main>
+  </section>
 </template>
 
 <style scoped>
-main {
+section {
   background-image: url('@/assets/img/category-bg.jpg');
 }
 </style>

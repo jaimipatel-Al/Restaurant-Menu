@@ -7,6 +7,7 @@ import * as yup from 'yup'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import toast from '@/plugin/toast'
+import swal from '@/plugin/sweetalert'
 
 const route = useRoute()
 const router = useRouter()
@@ -62,6 +63,18 @@ const removeImage = () => {
   imageUrl.value = null
   file.value.value = null
 }
+const showAlert = () => {
+  swal
+    .fire({
+      title: 'No Category Found',
+      text: 'First You Should Add Category.',
+      icon: 'warning',
+      showCancelButton: false,
+    })
+    .then((result) => {
+      if (result.isConfirmed) router.push('/category/add-category')
+    })
+}
 
 const getItemDetail = async () => {
   isGetting.value = true
@@ -86,7 +99,8 @@ const getItemDetail = async () => {
 const getCategories = async () => {
   await Axios.get(api.listCategory)
     .then(({ data }) => {
-      categories.value = data?.data
+      categories.value = data?.data ?? []
+      if (!categories.value?.length) showAlert()
     })
     .catch((er) => {
       console.log(er)
@@ -175,7 +189,7 @@ onMounted(() => getCategories())
 </script>
 
 <template>
-  <main class="w-screen h-screen bg-cover pt-16 add-edit-form">
+  <section class="w-screen h-screen bg-cover pt-16 add-edit-form">
     <div
       class="md:w-5/6 shadow shadow-2xl p-8 mx-auto"
       style="background: rgb(250, 200, 200, 0.25)"
@@ -272,11 +286,11 @@ onMounted(() => getCategories())
         </div>
       </Form>
     </div>
-  </main>
+  </section>
 </template>
 
 <style scoped>
-main {
+section {
   background-image: url('@/assets/img/add-item-bg.jpg');
 }
 </style>

@@ -116,7 +116,7 @@ watch(
 </script>
 
 <template>
-  <main class="w-screen h-screen bg-cover flex items-center justify-end add-edit-form">
+  <section class="w-screen h-screen bg-cover flex items-center justify-end add-edit-form">
     <div
       class="sm:w-1/3 shadow shadow-2xl m-16 p-8"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
@@ -180,11 +180,11 @@ watch(
         </button>
       </Form>
     </div>
-  </main>
+  </section>
 </template>
 
 <style scoped>
-main {
+section {
   background-image: url('@/assets/img/add-category-bg.jpg');
 }
 </style>
