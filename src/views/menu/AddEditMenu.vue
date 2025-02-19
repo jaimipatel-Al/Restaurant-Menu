@@ -33,6 +33,7 @@ const price = ref()
 const isTodayMenu = ref(false)
 const file = ref()
 const image = ref()
+const isActive = ref(false)
 const imageUrl = ref()
 const isLoading = ref(false)
 const isItemLoading = ref(false)
@@ -50,8 +51,6 @@ const removeImage = () => {
   image.value = null
   file.value.value = null
 }
-
-// -------------------------------------------------------------------------------------
 
 const totalPrice = computed(() => {
   if (selectedItem.value?.length) return selectedItem.value.reduce((e, item) => e + item.price, 0)
@@ -82,25 +81,25 @@ const addMenu = async () => {
   isLoading.value = true
 
   let formData
-  // if (imageUrl.value) {
-  //   formData = new FormData()
-  //   formData.append('name', title.value)
-  //   formData.append('price', price.value)
-  //   formData.append('image', image.value)
-  //   formData.append('isTodayMenu', isTodayMenu.value)
-  //   selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
-  // } else
-  formData = {
-    name: title.value,
-    price: price.value,
-    isTodayMenu: isTodayMenu.value,
-    subCategories: selectedItem.value.map((e) => {
-      return { subCategoryId: e._id }
-    }),
-  }
+  if (imageUrl.value) {
+    formData = new FormData()
+    formData.append('name', title.value)
+    formData.append('price', price.value)
+    formData.append('isTodayMenu', isTodayMenu.value)
+    formData.append('isActive', isActive.value)
+    formData.append('image', image.value)
+    selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
+  } else
+    formData = {
+      name: title.value,
+      price: price.value,
+      isTodayMenu: isTodayMenu.value,
+      isActive: isActive.value,
+      subCategories: selectedItem.value.map((e) => e._id),
+    }
 
   await Axios.post(api.createMenu, formData, {
-    // headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { 'Content-Type': 'multipart/form-data' },
   })
     .then(() => {
       toast.success('Menu created successfully!!')
@@ -121,15 +120,17 @@ const editMenu = async () => {
     formData = new FormData()
     formData.append('name', title.value)
     formData.append('price', price.value)
-    formData.append('image', image.value)
     formData.append('isTodayMenu', isTodayMenu.value)
-    selectedItem.value.forEach((e, i) => formData.append(`subCategoryId[${i}]`, e._id))
+    formData.append('isActive', isActive.value)
+    formData.append('image', image.value)
+    selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
   } else
     formData = {
       name: title.value,
       price: price.value,
       isTodayMenu: isTodayMenu.value,
-      subCategoryId: selectedItem.value.map((e) => e._id),
+      isActive: isActive.value,
+      subCategories: selectedItem.value.map((e) => e._id),
     }
 
   await Axios.put(`${api.updateMenu}${id.value}`, formData, {
@@ -155,8 +156,9 @@ const getMenuDetail = async () => {
       title.value = res.name
       price.value = res.price
       isTodayMenu.value = res.isTodayMenu
+      isActive.value = res.isActive
       imageUrl.value = res.image
-      // selectedItem
+      selectedItem.value = res.subCategories
     })
     .catch((er) => {
       console.log(er)
@@ -182,7 +184,7 @@ onMounted(() => {
 <template>
   <section class="w-screen h-screen bg-cover flex items-center justify-end add-edit-form">
     <div
-      class="w-full h-5/6 shadow shadow-2xl m-10 p-8 flex"
+      class="w-full h-5/6 shadow shadow-2xl mx-10 p-8 flex"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
       <div class="w-96 flex-none">
@@ -206,7 +208,9 @@ onMounted(() => {
           <p v-if="!isGetting" class="error-message">{{ errors?.Title }}</p>
 
           <label for="price">Price</label>
+          <p v-if="isGetting" class="bg-gray-300 mb-4 h-14 w-full rounded-md animate-pulse"></p>
           <Field
+            v-if="!isGetting"
             v-model="price"
             type="number"
             name="Price"
@@ -214,19 +218,23 @@ onMounted(() => {
             class="input"
             placeholder="Enter Your Price"
           />
-          <p v-if="selectedItem?.length" class="text-green-700 text-sm font-semibold">
+          <p v-if="selectedItem?.length && !isGetting" class="text-green-700 text-sm font-semibold">
             Total price of selected item : {{ totalPrice }}
           </p>
-          <p class="error-message">{{ errors?.Price }}</p>
+          <p v-if="!isGetting" class="error-message">{{ errors?.Price }}</p>
 
-          <label for="remember" class="flex items-center space-x-3 mb-5 pt-3">
+          <label v-if="!isGetting" for="today-menu" class="flex items-center space-x-3">
             <input
               v-model="isTodayMenu"
               type="checkbox"
-              id="remember"
+              id="today-menu"
               class="w-4 h-4 cursor-pointer"
             />
             Is Add on Today's Menu?
+          </label>
+          <label v-if="!isGetting" for="active" class="flex items-center space-x-3 mb-5">
+            <input v-model="isActive" type="checkbox" id="active" class="w-4 h-4 cursor-pointer" />
+            Available
           </label>
 
           <label v-if="!isGetting" for="image" style="display: flex" class="items-center">
@@ -252,7 +260,7 @@ onMounted(() => {
         </Form>
       </div>
       <div class="ml-3 w-full">
-        <div v-if="isItemLoading" class="no-data">
+        <div v-if="isItemLoading || isGetting" class="no-data">
           <ArrowPathIcon class="w-6 mx-3" /> Loading...
         </div>
         <div v-else-if="items?.length == 0" class="no-data">

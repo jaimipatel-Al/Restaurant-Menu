@@ -1,4 +1,5 @@
 <script setup>
+import { ShoppingCartIcon } from '@heroicons/vue/24/solid'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import toast from '@/plugin/toast'
@@ -27,8 +28,16 @@ const logout = () => {
         <RouterLink to="/menu" class="router-link">Menu</RouterLink>
         <RouterLink to="/category" class="router-link">Categories</RouterLink>
         <RouterLink to="/item" class="router-link">Item</RouterLink>
+        <span class="router-link" @click="logout()">Logout</span>
+        <div class="relative cursor-pointer hover:bg-orange-50 rounded-full">
+          <ShoppingCartIcon class="w-14 p-2" />
+          <span
+            class="absolute py-0.5 px-2 text-sm bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"
+          >
+            9
+          </span>
+        </div>
       </template>
-      <span v-if="authStore?.userData?.userId" class="router-link" @click="logout()">Logout</span>
       <RouterLink v-else to="/signup" class="router-link">Sign Up</RouterLink>
     </nav>
   </header>

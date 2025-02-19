@@ -16,8 +16,8 @@ watch(route, () => {
     <HeaderComp
       v-if="!isHideHeader"
       class="w-full absolute bg-white bg-opacity-50"
-      style="height: 80px"
+      style="height: 65px"
     />
-    <RouterView :style="`padding-top: ${!isHideHeader ? '80px' : '0'}`" />
+    <RouterView :style="`padding-top: ${!isHideHeader ? '60px' : '0'}`" />
   </main>
 </template>

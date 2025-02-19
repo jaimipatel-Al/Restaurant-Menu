@@ -13,12 +13,15 @@ const requests = {
   deleteItem: 'subcategories/delete-subcategories/',
   createItem: 'subcategories/create-subcategories',
   updateItem: 'subcategories/update-subcategories/',
+  toggleItemAvailability: 'subcategories/toggle-subcategory-status/',
 
   listMenu: 'menu/get-all-menu',
   getMenu: 'menu/get-menu-details/',
   deleteMenu: 'menu/delete-menu/',
   createMenu: 'menu/create-menu',
   updateMenu: 'menu/update-menu/',
+  toggleMenuAvailability: 'menu/toggle-menu-status/',
+  selectToday: 'menu/select-today/',
 }
 
 export default requests

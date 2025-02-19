@@ -58,7 +58,7 @@ onMounted(() => {
 
 <template>
   <section class="w-screen h-screen bg-cover">
-    <div class="flex-between p-8">
+    <div class="flex-between px-8 py-5">
       <h1 class="auth-title">Category</h1>
       <RouterLink to="/category/add-category" class="button flex items-center"
         ><PlusIcon class="w-12 mr-2" /> Add Category</RouterLink

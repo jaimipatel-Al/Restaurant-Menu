@@ -48,6 +48,7 @@ const quantity = ref()
 const file = ref()
 const image = ref()
 const imageUrl = ref()
+const isActive = ref(false)
 const isLoading = ref(false)
 const isGetting = ref(false)
 
@@ -88,6 +89,7 @@ const getItemDetail = async () => {
       category.value = res.categoryId._id
       price.value = res.price
       quantity.value = res.quantity
+      isActive.value = res.isActive
     })
     .catch((er) => {
       console.log(er)
@@ -153,6 +155,7 @@ const editItem = async () => {
     formData.append('categoryId', category.value)
     formData.append('price', price.value)
     formData.append('quantity', quantity.value)
+    formData.append('isActive', isActive.value)
   } else
     formData = {
       title: title.value,
@@ -160,6 +163,7 @@ const editItem = async () => {
       categoryId: category.value,
       price: price.value,
       quantity: quantity.value,
+      isActive: isActive.value,
     }
 
   await Axios.put(`${api.updateItem}${id.value}`, formData, {
@@ -189,9 +193,9 @@ onMounted(() => getCategories())
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover pt-16 add-edit-form">
+  <section class="w-screen h-screen bg-cover add-edit-form">
     <div
-      class="md:w-5/6 shadow shadow-2xl p-8 mx-auto"
+      class="md:w-5/6 shadow shadow-2xl my-8 p-8 mx-auto"
       style="background: rgb(250, 200, 200, 0.25)"
     >
       <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Item</h1>
@@ -283,6 +287,16 @@ onMounted(() => getCategories())
             placeholder="Enter Your Quantity"
           />
           <p class="error-message">{{ errors?.Quantity }}</p>
+
+          <label v-if="id" for="available" class="flex items-center font-semibold">
+            <input
+              v-model="isActive"
+              type="checkbox"
+              id="available"
+              class="w-4 h-4 cursor-pointer mr-2"
+            />
+            Available
+          </label>
         </div>
       </Form>
     </div>

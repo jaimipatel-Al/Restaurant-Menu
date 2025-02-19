@@ -50,6 +50,15 @@ const deleteItem = async (data) => {
       data.isDeleting = false
     })
 }
+const availableItem = async (data) => {
+  await Axios.patch(`${api.toggleItemAvailability}${data._id}`)
+    .then(() => {
+      toast.success('Item Availability Changed successfully!!')
+    })
+    .catch((er) => {
+      console.log(er)
+    })
+}
 
 onMounted(() => {
   getItems()
@@ -58,7 +67,7 @@ onMounted(() => {
 
 <template>
   <section class="w-screen h-screen bg-cover">
-    <div class="flex-between p-8">
+    <div class="flex-between px-8 py-5">
       <h1 class="auth-title">Items</h1>
       <RouterLink to="/item/add-item" class="button flex items-center"
         ><PlusIcon class="w-12 mr-2" /> Add Item</RouterLink
@@ -72,7 +81,7 @@ onMounted(() => {
       <div
         v-for="i in items"
         :key="i"
-        class="p-2 shadow shadow-2xl rounded rounded-xl w-80 my-8 mx-3"
+        class="p-2 shadow shadow-2xl rounded rounded-xl w-80 my-5 mx-3"
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="h-72">
@@ -98,6 +107,16 @@ onMounted(() => {
           </div>
         </div>
         <div class="p-2">
+          <label :for="`available-${i._id}`" class="flex items-center font-semibold">
+            <input
+              v-model="i.isActive"
+              type="checkbox"
+              :id="`available-${i._id}`"
+              class="w-4 h-4 cursor-pointer mr-2"
+              @change="availableItem(i)"
+            />
+            Available
+          </label>
           <div class="flex-between font-semibold">
             <RouterLink to="/category" class="text-orange-400 text-sm">{{
               i.categoryId?.title
