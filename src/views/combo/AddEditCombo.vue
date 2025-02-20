@@ -254,7 +254,7 @@ onMounted(() => {
             />
           </div>
 
-          <button type="submit" :disabled="isLoading || isGetting">
+          <button type="submit" :disabled="isLoading || isGetting || items?.length == 0">
             {{ id ? 'Edit ' : 'Add ' }} Combo <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
           </button>
         </Form>
