@@ -1,4 +1,26 @@
 <script setup>
+import { useAuthStore } from '@/stores/authStore'
+import { useRouter } from 'vue-router'
+import swal from '@/plugin/sweetalert'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const exploreRestaurant = () => {
+  if (authStore?.userData?.userId) router.push('/restaurant')
+  else {
+    swal
+      .fire({
+        title: 'No Access Granted',
+        text: 'First You Should Sig Up Or Login To System.',
+        icon: 'warning',
+        showCancelButton: false,
+      })
+      .then((result) => {
+        if (result.isConfirmed) router.push('/signup')
+      })
+  }
+}
 </script>
 
 <template>
@@ -14,7 +36,7 @@
           love great flavors, we bring you the best dishes, guides, and tips to satisfy your
           cravings. Let's explore more together!
         </p>
-        <button class="button">Explore Food</button>
+        <button class="button" @click="exploreRestaurant()">Explore Food</button>
       </div>
       <img src="@/assets/img/dal-rice.jpg" alt="Dal Rice" class="w-auto h-100" />
     </section>
@@ -28,7 +50,7 @@
           several teams to perform specific tasks. Without teamwork nothing is possible. So, we are
           doing team work over 2years and giving more facilities in our Hamburger Shop.
         </p>
-        <button class="button">Contact Us</button>
+        <button class="button" @click="exploreRestaurant()">Contact Us</button>
       </div>
     </section>
     <section class="text-center bg-gray-100 p-10">

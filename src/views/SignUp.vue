@@ -70,7 +70,7 @@ const signup = async () => {
 
 <template>
   <main class="auth flex items-center">
-    <div class="auth-box" style="height: 660px">
+    <div class="auth-box h-5/6">
       <div class="auth-img-box">
         <img src="@/assets/img/signup.jpg" alt="Sign Up" class="full-image" />
       </div>
@@ -81,14 +81,20 @@ const signup = async () => {
           <RouterLink to="/login" class="route-link">Login</RouterLink>
         </p>
         <Form @submit="signup()" :validation-schema="schema" v-slot="{ errors }">
-          <label for="name">Name</label>
+          <label for="type">Register As</label>
+          <select name="Type" id="type" v-model="type" class="input">
+            <option value="owner">Owner</option>
+            <option value="customer">Customer</option>
+          </select>
+
+          <label for="name">{{ type == 'customer' ? 'User Name' : 'Restaurant Name' }}</label>
           <Field
             v-model="name"
             type="text"
             name="Name"
             id="name"
             class="input"
-            placeholder="Enter Your Name"
+            :placeholder="`Enter Your ${type == 'customer' ? 'User' : 'Restaurant'} Name`"
           />
           <p class="error-message">{{ errors?.Name }}</p>
 
@@ -136,15 +142,9 @@ const signup = async () => {
           </div>
           <p class="error-message">{{ errors?.ConfirmPassword }}</p>
 
-          <label for="type">Register As</label>
-          <select name="Type" id="type" v-model="type" class="input">
-            <option value="owner">Owner</option>
-            <option value="customer">Customer</option>
-          </select>
-
           <button
             type="submit"
-            class="button flex items-center justify-center w-full mt-10"
+            class="button flex items-center justify-center w-full mt-8"
             :disabled="isSignup"
           >
             Sign Up <ArrowPathIcon v-if="isSignup" class="w-6 mx-3" />

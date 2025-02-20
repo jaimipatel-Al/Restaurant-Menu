@@ -24,7 +24,7 @@ const getCombo = async () => {
 
   await Axios.get(api.listCombo)
     .then(({ data }) => {
-      combos.value = data?.data?.map((e) => {
+      combos.value = data?.data?.menus?.map((e) => {
         return { ...e, isDeleting: false }
       })
     })

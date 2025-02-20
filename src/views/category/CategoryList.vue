@@ -24,7 +24,7 @@ const getCategories = async () => {
 
   await Axios.get(api.listCategory)
     .then(({ data }) => {
-      categories.value = data?.data?.map((e) => {
+      categories.value = data?.data?.categories?.map((e) => {
         return { ...e, isDeleting: false }
       })
     })

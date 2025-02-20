@@ -102,7 +102,7 @@ const getItemDetail = async () => {
 const getCategories = async () => {
   await Axios.get(api.listCategory)
     .then(({ data }) => {
-      categories.value = data?.data ?? []
+      categories.value = data?.data?.categories ?? []
       if (!categories.value?.length) showAlert()
     })
     .catch((er) => {

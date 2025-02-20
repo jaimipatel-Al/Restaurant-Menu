@@ -68,7 +68,7 @@ const getItems = async () => {
 
   await Axios.get(api.listItem)
     .then(({ data }) => {
-      items.value = data?.data
+      items.value = data?.data?.subcategories
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -183,7 +183,7 @@ onMounted(() => {
 <template>
   <section class="bg-screen flex items-center justify-end add-edit-form">
     <div
-      class="w-full h-5/6 shadow-2xl mx-10 p-8 flex"
+      class="w-full h-5/6 shadow-2xl mx-10 py-5 px-10 flex"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
       <div class="w-96 flex-none">

@@ -24,7 +24,7 @@ const getItems = async () => {
 
   await Axios.get(api.listItem)
     .then(({ data }) => {
-      items.value = data?.data?.map((e) => {
+      items.value = data?.data?.subcategories?.map((e) => {
         return { ...e, isDeleting: false }
       })
     })
