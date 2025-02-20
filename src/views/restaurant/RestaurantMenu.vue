@@ -1,11 +1,14 @@
 <script setup>
-import { ArrowPathIcon, NoSymbolIcon } from '@heroicons/vue/24/solid'
+import { ArrowPathIcon, NoSymbolIcon, PlusIcon, MinusIcon } from '@heroicons/vue/24/solid'
 import { computed, onMounted, ref } from 'vue'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { useRoute } from 'vue-router'
+import toast from '@/plugin/toast'
+import { useCartStore } from '@/stores/cartStore'
 
 const route = useRoute()
+const cartStore = useCartStore()
 
 const id = computed(() => route?.params?.id)
 
@@ -14,6 +17,7 @@ const isItemLoading = ref(false)
 const menus = ref([])
 const items = ref([])
 const todaySpecial = ref(null)
+const cart = ref([])
 
 const getCustomerMenu = async () => {
   isMenuLoading.value = true
@@ -21,9 +25,11 @@ const getCustomerMenu = async () => {
   await Axios.get(`${api.customerMenu}${id.value}?page=1&limit=100`)
     .then(({ data }) => {
       menus.value = data?.data?.menus?.map((e) => {
-        return { ...e, isDeleting: false }
+        return { ...e, isCartLoading: false }
       })
-      todaySpecial.value = menus?.value?.[0] ?? null
+      todaySpecial.value = data?.data?.todaySpecial
+        ? { ...data.data.todaySpecial, isCartLoading: false }
+        : null
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -38,7 +44,7 @@ const getCustomerItems = async () => {
   await Axios.get(`${api.customerItems}${id.value}?page=1&limit=100`)
     .then(({ data }) => {
       items.value = data?.data?.items?.map((e) => {
-        return { ...e, isDeleting: false }
+        return { ...e, isCartLoading: false }
       })
     })
     .catch((er) => {
@@ -48,10 +54,89 @@ const getCustomerItems = async () => {
       isItemLoading.value = false
     })
 }
+const getCart = async () => {
+  await Axios.get(api.getCart)
+    .then(({ data }) => {
+      let res = data.data
+      cart.value = res.items
+    })
+    .catch((er) => {
+      console.error(er?.response?.data?.message)
+    })
+}
+const addMenuToCart = async (val, isSpecial = false) => {
+  if (isSpecial) todaySpecial.value.isCartLoading = true
+  else val.isCartLoading = true
+
+  let payload = {
+    menuId: val._id,
+    menuQuantity: 1,
+  }
+  await addToCart(payload, 'Menu')
+
+  if (isSpecial) todaySpecial.value.isCartLoading = false
+  else val.isCartLoading = false
+}
+const addItemToCart = async (val) => {
+  val.isCartLoading = true
+
+  let payload = {
+    itemId: val._id,
+    itemQuantity: 1,
+  }
+  await addToCart(payload, 'Combo')
+
+  val.isCartLoading = false
+}
+const addToCart = async (payload) => {
+  await Axios.post(api.addCart, payload)
+    .then(({ data }) => {
+      let res = data.data
+      cartStore.setCartValue(res.itemsCount)
+      cart.value = res.cart?.items
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message)
+    })
+}
+const removeMenuFromCart = async (val, isSpecial = false) => {
+  if (isSpecial) todaySpecial.value.isCartLoading = true
+  else val.isCartLoading = true
+
+  let payload = {
+    menuId: val._id,
+  }
+  await removeFromCart(payload, 'Menu')
+
+  if (isSpecial) todaySpecial.value.isCartLoading = false
+  else val.isCartLoading = false
+}
+const removeItemFromCart = async (val) => {
+  val.isCartLoading = true
+
+  let payload = {
+    itemId: val._id,
+  }
+  await removeFromCart(payload, 'Combo')
+
+  val.isCartLoading = false
+}
+const removeFromCart = async (payload) => {
+  await Axios.delete(api.removeCart, { data: payload })
+    .then(({ data }) => {
+      let res = data?.data ?? {}
+      cartStore.setCartValue(res?.itemsCount ?? 0)
+      cart.value = res?.updatedCart?.items ?? []
+    })
+    .catch((er) => {
+      toast.error(er?.response?.data?.message)
+    })
+}
 
 onMounted(() => {
   getCustomerMenu()
   getCustomerItems()
+  getCart()
 })
 </script>
 
@@ -96,7 +181,36 @@ onMounted(() => {
                   Quantity : {{ todaySpecial.subCategories?.length }}
                 </p>
               </div>
-              <button class="button text-lg mt-2 py-1.5 block px-5">Add To Cart</button>
+              <div>
+                <button
+                  :disabled="todaySpecial.isCartLoading"
+                  v-if="!cart.find((e) => e.menuId?._id == todaySpecial._id)"
+                  class="button text-lg flex py-1.5 block px-5"
+                  @click="addMenuToCart(todaySpecial, true)"
+                >
+                  <ArrowPathIcon v-if="todaySpecial.isCartLoading" class="w-6 mr-1" /> Add To Cart
+                </button>
+                <div v-else class="flex items-center space-x-3">
+                  <button
+                    :disabled="todaySpecial.isCartLoading"
+                    class="button p-2"
+                    @click="removeMenuFromCart(todaySpecial, true)"
+                  >
+                    <MinusIcon class="w-6" />
+                  </button>
+                  <ArrowPathIcon v-if="todaySpecial.isCartLoading" class="w-6 text-orange-700" />
+                  <span v-else class="font-semibold text-lg p-1.5">
+                    {{ cart.find((e) => e.menuId?._id == todaySpecial._id)?.quantity ?? 0 }}
+                  </span>
+                  <button
+                    :disabled="todaySpecial.isCartLoading"
+                    class="button p-2"
+                    @click="addMenuToCart(todaySpecial, true)"
+                  >
+                    <PlusIcon class="w-6" />
+                  </button>
+                </div>
+              </div>
             </div>
             <div class="flex justify-start overflow-x-auto w-full">
               <div
@@ -152,7 +266,26 @@ onMounted(() => {
             </h3>
             <span class="text-sm text-green-700">Quantity : {{ m.subCategories?.length }}</span>
 
-            <button class="button text-lg mt-2 py-1.5 block px-5">Add To Cart</button>
+            <button
+              :disabled="m.isCartLoading"
+              v-if="!cart.find((e) => e.menuId?._id == m._id)"
+              class="button text-lg flex mt-2 py-1.5 block px-5"
+              @click="addMenuToCart(m)"
+            >
+              <ArrowPathIcon v-if="m.isCartLoading" class="w-6 mr-1" /> Add To Cart
+            </button>
+            <div v-else class="flex items-center space-x-3">
+              <button :disabled="m.isCartLoading" class="button p-2" @click="removeMenuFromCart(m)">
+                <MinusIcon class="w-6" />
+              </button>
+              <ArrowPathIcon v-if="m.isCartLoading" class="w-6 text-orange-700" />
+              <span v-else class="font-semibold text-lg p-1.5">
+                {{ cart.find((e) => e.menuId?._id == m._id)?.quantity ?? 0 }}
+              </span>
+              <button :disabled="m.isCartLoading" class="button p-2" @click="addMenuToCart(m)">
+                <PlusIcon class="w-6" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -188,7 +321,30 @@ onMounted(() => {
                 <span class="text-sm text-orange-700">{{ i.categoryId?.title }}</span>
               </p>
 
-              <button class="button text-lg mt-2 py-1.5 block px-5">Add To Cart</button>
+              <button
+                :disabled="i.isCartLoading"
+                v-if="!cart.find((e) => e?.itemId?._id == i._id)"
+                class="button text-lg flex mt-2 py-1.5 block px-5"
+                @click="addItemToCart(i)"
+              >
+                <ArrowPathIcon v-if="i.isCartLoading" class="w-6 mr-1" /> Add To Cart
+              </button>
+              <div v-else class="flex items-center space-x-3">
+                <button
+                  :disabled="i.isCartLoading"
+                  class="button p-2"
+                  @click="removeItemFromCart(i)"
+                >
+                  <MinusIcon class="w-6" />
+                </button>
+                <ArrowPathIcon v-if="i.isCartLoading" class="w-6 text-orange-700" />
+                <span v-else class="font-semibold text-lg p-1.5">
+                  {{ cart.find((e) => e.itemId?._id == i._id)?.quantity ?? 0 }}
+                </span>
+                <button :disabled="i.isCartLoading" class="button p-2" @click="addItemToCart(i)">
+                  <PlusIcon class="w-6" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

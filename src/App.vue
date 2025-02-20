@@ -18,6 +18,6 @@ watch(route, () => {
       class="w-full absolute bg-white bg-opacity-50"
       style="height: 80px"
     />
-    <RouterView :style="`padding-top: ${!isHideHeader ? '60px' : '0'}`" />
+    <RouterView :style="`padding-top: ${!isHideHeader ? '75px' : '0'}`" />
   </main>
 </template>

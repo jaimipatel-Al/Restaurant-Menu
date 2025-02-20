@@ -27,6 +27,11 @@ const requests = {
 
   customerMenu: `customer/menu/`,
   customerItems: `customer/items/`,
+
+  addCart: 'cart/add-item-cart',
+  removeCart: 'cart/remove-cart-item',
+  getCart: 'cart/get-cart',
+  deleteCart: 'cart/delete-cart',
 }
 
 export default requests

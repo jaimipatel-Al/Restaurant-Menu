@@ -2,16 +2,23 @@
 import { ShoppingCartIcon } from '@heroicons/vue/24/solid'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useCartStore } from '@/stores/cartStore'
 import toast from '@/plugin/toast'
+import { onMounted } from 'vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const cartStore = useCartStore()
 
 const logout = () => {
   authStore.logOut()
   toast.success('User Logged Out successfully')
   router.push('/login')
 }
+
+onMounted(() => {
+  cartStore.getCartValue()
+})
 </script>
 
 <template>
@@ -53,9 +60,10 @@ const logout = () => {
       >
         <ShoppingCartIcon class="w-12 p-2" />
         <span
+          v-if="cartStore.cart"
           class="absolute py-1 px-2 text-xs bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"
         >
-          10
+          {{ cartStore.cart }}
         </span>
       </div>
       <RouterLink v-else to="/signup" class="router-link">Sign Up</RouterLink>
