@@ -117,17 +117,15 @@ watch(
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover flex items-center justify-end add-edit-form">
+  <section class="bg-screen flex items-center justify-end add-edit-form">
     <div
-      class="sm:w-1/3 shadow shadow-2xl m-16 p-8"
+      class="sm:w-1/3 shadow-2xl m-16 p-8"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
       <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Category</h1>
       <p class="auth-detail">
         Organize your menu effortlessly by {{ id ? 'updating  ' : 'adding  ' }} food categories!
-        <RouterLink to="/category" class="text-orange-600 underline"
-          >Back to Category list</RouterLink
-        >
+        <RouterLink to="/category" class="route-link">Back to Category list</RouterLink>
       </p>
       <Form
         @submit="id ? editCategory() : addCategory()"
@@ -135,7 +133,7 @@ watch(
         v-slot="{ errors }"
       >
         <label for="title">Title</label>
-        <p v-if="isGetting" class="bg-gray-300 mb-4 h-14 w-full rounded-md animate-pulse"></p>
+        <p v-if="isGetting" class="input-shimmer"></p>
         <Field
           v-if="!isGetting"
           v-model="title"
@@ -148,7 +146,7 @@ watch(
         <p v-if="!isGetting" class="error-message">{{ errors?.Title }}</p>
 
         <label for="description">Description</label>
-        <p v-if="isGetting" class="bg-gray-300 mb-4 h-40 w-full rounded-md animate-pulse"></p>
+        <p v-if="isGetting" class="textarea-shimmer"></p>
         <Field v-if="!isGetting" v-model="description" v-slot="{ field }" name="Description">
           <textarea
             v-bind="field"
@@ -165,10 +163,7 @@ watch(
           <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
         </label>
         <div v-if="imageUrl && !isGetting" class="relative mt-4 w-24 h-24">
-          <XMarkIcon
-            class="absolute w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full -top-2 -right-2 text-white"
-            @click="removeImage()"
-          />
+          <XMarkIcon class="remove-image" @click="removeImage()" />
           <img
             :src="imageUrl"
             alt="Uploaded Image"

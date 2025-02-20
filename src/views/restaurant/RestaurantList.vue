@@ -33,7 +33,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover">
+  <section class="bg-screen">
     <h1 class="auth-title px-8 py-5">Restaurants</h1>
     <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-12 mx-3" /> Loading...</div>
     <div v-else-if="restaurants?.length == 0" class="no-data">
@@ -43,7 +43,7 @@ onMounted(() => {
       <div
         v-for="(r, i) in restaurants"
         :key="r._id"
-        class="h-auto m-2 p-3 cursor-pointer bg-white shadow shadow-2xl"
+        class="h-auto m-2 p-3 cursor-pointer bg-white shadow-2xl"
         @click="router.push(`/restaurant/${r._id}`)"
       >
         <div>

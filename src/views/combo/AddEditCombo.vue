@@ -181,16 +181,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover flex items-center justify-end add-edit-form">
+  <section class="bg-screen flex items-center justify-end add-edit-form">
     <div
-      class="w-full h-5/6 shadow shadow-2xl mx-10 p-8 flex"
+      class="w-full h-5/6 shadow-2xl mx-10 p-8 flex"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
       <div class="w-96 flex-none">
         <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Combo</h1>
         <p class="auth-detail">
           Make Combo, A perfect mix of tasty snacks and hearty meals.
-          <RouterLink to="/combo" class="text-orange-600 underline">Back to Combo list</RouterLink>
+          <RouterLink to="/combo" class="route-link">Back to Combo list</RouterLink>
         </p>
         <Form
           @submit="id ? editCombo() : addCombo()"
@@ -198,7 +198,7 @@ onMounted(() => {
           v-slot="{ errors }"
         >
           <label for="title">Title</label>
-          <p v-if="isGetting" class="bg-gray-300 mb-4 h-14 w-full rounded-md animate-pulse"></p>
+          <p v-if="isGetting" class="input-shimmer"></p>
           <Field
             v-if="!isGetting"
             v-model="title"
@@ -211,7 +211,7 @@ onMounted(() => {
           <p v-if="!isGetting" class="error-message">{{ errors?.Title }}</p>
 
           <label for="price">Price</label>
-          <p v-if="isGetting" class="bg-gray-300 mb-4 h-14 w-full rounded-md animate-pulse"></p>
+          <p v-if="isGetting" class="input-shimmer"></p>
           <Field
             v-if="!isGetting"
             v-model="price"
@@ -246,10 +246,7 @@ onMounted(() => {
             <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
           </label>
           <div v-if="imageUrl && !isGetting" class="relative mt-4 w-24 h-24">
-            <XMarkIcon
-              class="absolute w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full -top-2 -right-2 text-white"
-              @click="removeImage()"
-            />
+            <XMarkIcon class="remove-image" @click="removeImage()" />
             <img
               :src="imageUrl"
               alt="Uploaded Image"
@@ -268,23 +265,18 @@ onMounted(() => {
         </div>
         <div v-else-if="items?.length == 0" class="no-data">
           <NoSymbolIcon class="w-12 mx-3" /> No Item Available
-          <RouterLink to="/item/add-item" class="text-orange-600 underline ml-2">
-            Add items</RouterLink
-          >
+          <RouterLink to="/item/add-item" class="route-link ml-2"> Add items</RouterLink>
         </div>
         <div v-else class="flex flex-wrap items-start justify-start overflow-y-auto h-full">
           <div
             v-for="i in items"
             :key="i"
-            class="p-2 shadow shadow-2xl rounded rounded-xl w-56 m-2 cursor-pointer"
+            class="p-2 shadow-2xl rounded-xl w-56 m-2 cursor-pointer"
             style="background: rgb(255, 255, 255, 0.8)"
             :class="{ 'active-item relative': selectedItem.find((e) => e?._id == i?._id) }"
             @click="addItem(i)"
           >
-            <XMarkIcon
-              v-if="selectedItem.find((e) => e?._id == i?._id)"
-              class="w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full absolute -top-2 -right-2 text-white"
-            />
+            <XMarkIcon v-if="selectedItem.find((e) => e?._id == i?._id)" class="remove-image" />
             <div class="h-40">
               <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
               <img

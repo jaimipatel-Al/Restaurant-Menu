@@ -77,12 +77,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover">
+  <section class="bg-screen">
     <div class="flex-between px-8 py-5">
       <h1 class="auth-title">Combo</h1>
-      <RouterLink to="/combo/add-combo" class="button flex items-center"
-        ><PlusIcon class="w-12 mr-2" /> Add Combo</RouterLink
-      >
+      <RouterLink to="/combo/add-combo" class="add-btn"><PlusIcon /> Add Combo</RouterLink>
     </div>
     <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-12 mx-3" /> Loading...</div>
     <div v-else-if="combos?.length == 0" class="no-data">
@@ -92,7 +90,7 @@ onMounted(() => {
       <div
         v-for="(m, i) in combos"
         :key="m._id"
-        class="grid grid-cols-3 grid-rows-3 grid-container p-10 shadow shadow-2xl"
+        class="grid grid-cols-3 grid-rows-3 grid-container p-10 shadow-2xl"
         :style="`background: ${
           i % 2 == 1 ? 'rgb(255, 255, 255, 0.8)' : 'rgba(250, 200, 150, 0.6)'
         }`"
@@ -153,7 +151,7 @@ onMounted(() => {
             <div
               v-for="i in m.subCategories"
               :key="i"
-              class="p-2 shadow shadow-2xl rounded rounded-xl w-56 flex-none m-2 cursor-pointer"
+              class="p-2 shadow-2xl rounded-xl w-56 flex-none m-2 cursor-pointer"
               style="background: rgb(255, 255, 255, 0.8)"
               @click="addItem(i)"
             >

@@ -57,12 +57,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover">
+  <section class="bg-screen">
     <div class="flex-between px-8 py-5">
       <h1 class="auth-title">Category</h1>
-      <RouterLink to="/category/add-category" class="button flex items-center"
-        ><PlusIcon class="w-12 mr-2" /> Add Category</RouterLink
-      >
+      <RouterLink to="/category/add-category" class="add-btn"><PlusIcon /> Add Category</RouterLink>
     </div>
     <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-12 mx-3" /> Loading...</div>
     <div v-else-if="categories?.length == 0" class="no-data">
@@ -72,7 +70,7 @@ onMounted(() => {
       <div
         v-for="c in categories"
         :key="c._id"
-        class="md:w-5/6 h-64 mx-auto p-3 my-8 shadow shadow-2xl rounded rounded-xl flex space-x-5 flex-col sm:flex-row"
+        class="md:w-5/6 h-64 mx-auto p-3 my-8 shadow-2xl rounded-xl flex space-x-5 flex-col sm:flex-row"
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="w-full sm:w-96 md:w-80 flex-none">

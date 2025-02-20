@@ -24,7 +24,7 @@
     }
 
     .home-food-box {
-        @apply flex-1 m-5 shadow rounded rounded-xl shadow-orange-900
+        @apply flex-1 m-5 shadow rounded-xl shadow-orange-900
     }
 
     .delivery-box {
@@ -36,7 +36,7 @@
     }
 
     .auth-box {
-        @apply w-5/6 shadow shadow-2xl shadow-slate-900 m-auto flex-between
+        @apply w-5/6 shadow-2xl shadow-slate-900 m-auto flex-between
     }
 
     .auth-img-box {
@@ -56,7 +56,7 @@
     }
 
     .input {
-        @apply border border-orange-200 rounded rounded-md p-3 text-gray-900 placeholder:text-gray-400 focus:outline-none text-lg w-full
+        @apply border border-orange-200 rounded-md p-3 text-gray-900 placeholder:text-gray-400 focus:outline-none text-lg w-full
     }
 
     .error-message {
@@ -76,15 +76,15 @@
     }
 
     .upload-button {
-        @apply w-8 border border-orange-600 p-1.5 text-orange-600 rounded rounded-full cursor-pointer hover:bg-orange-600 hover:text-white transition duration-100 ease-in
+        @apply w-8 border border-orange-600 p-1.5 text-orange-600 rounded-full cursor-pointer hover:bg-orange-600 hover:text-white transition duration-100 ease-in
     }
 
     .button-edit {
-        @apply text-green-500 w-10 p-2 rounded rounded-full hover:bg-orange-100 cursor-pointer
+        @apply text-green-500 w-10 p-2 rounded-full hover:bg-orange-100 cursor-pointer
     }
 
     .button-delete {
-        @apply text-red-500 w-10 p-2 rounded rounded-full hover:bg-orange-100 cursor-pointer
+        @apply text-red-500 w-10 p-2 rounded-full hover:bg-orange-100 cursor-pointer
     }
 
     .no-data {
@@ -96,7 +96,39 @@
     }
 
     .uploaded-image {
-        @apply rounded rounded-xl full-image
+        @apply rounded-xl full-image
+    }
+
+    .shimmer {
+        @apply bg-gray-300 mb-3 mt-1 w-full rounded-md animate-pulse
+    }
+
+    .input-shimmer {
+        @apply h-14 shimmer
+    }
+
+    .textarea-shimmer {
+        @apply h-40 shimmer
+    }
+
+    .route-link {
+        @apply text-orange-600 underline
+    }
+
+    .add-btn {
+        @apply bg-orange-700 text-white disabled:bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in text-lg py-2 px-3 md:py-3 md:px-4 flex items-center
+    }
+
+    .add-btn svg {
+        @apply w-8 mr-2
+    }
+
+    .remove-image {
+        @apply absolute w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full -top-2 -right-2 text-white
+    }
+
+    .bg-screen {
+        @apply w-screen h-screen bg-cover
     }
 }
 

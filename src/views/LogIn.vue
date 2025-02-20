@@ -77,7 +77,7 @@ onMounted(() => {
         <h1 class="auth-title">Login</h1>
         <p class="auth-detail">
           Doesn't have an account yet?
-          <RouterLink to="/signup" class="text-orange-600 underline">Sign Up</RouterLink>
+          <RouterLink to="/signup" class="route-link">Sign Up</RouterLink>
         </p>
         <Form @submit="login" :validation-schema="schema" v-slot="{ errors }">
           <label for="email">Email Address</label>

@@ -78,7 +78,7 @@ const signup = async () => {
         <h1 class="auth-title">Sign Up</h1>
         <p class="auth-detail">
           Already have an account?
-          <RouterLink to="/login" class="text-orange-600 underline">Login</RouterLink>
+          <RouterLink to="/login" class="route-link">Login</RouterLink>
         </p>
         <Form @submit="signup()" :validation-schema="schema" v-slot="{ errors }">
           <label for="name">Name</label>

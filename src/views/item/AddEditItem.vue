@@ -194,11 +194,8 @@ onMounted(() => getCategories())
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover add-edit-form">
-    <div
-      class="md:w-5/6 shadow shadow-2xl my-8 p-8 mx-auto"
-      style="background: rgb(250, 200, 200, 0.25)"
-    >
+  <section class="bg-screen add-edit-form">
+    <div class="md:w-5/6 shadow-2xl my-8 p-8 mx-auto" style="background: rgb(250, 200, 200, 0.25)">
       <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Item</h1>
       <p class="auth-detail">
         {{
@@ -206,7 +203,7 @@ onMounted(() => getCategories())
             ? 'Update an existing dish in just a few clicks.'
             : 'Add a new your favorite food items with our simple details.'
         }}
-        <RouterLink to="/item" class="text-orange-600 underline">Back to Item list</RouterLink>
+        <RouterLink to="/item" class="route-link">Back to Item list</RouterLink>
       </p>
       <Form
         @submit="id ? editItem() : addItem()"
@@ -216,10 +213,7 @@ onMounted(() => getCategories())
       >
         <div class="flex-1">
           <label for="title">Title</label>
-          <p
-            v-if="isGetting"
-            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
-          ></p>
+          <p v-if="isGetting" class="input-shimmer"></p>
           <Field
             v-if="!isGetting"
             v-model="title"
@@ -232,10 +226,7 @@ onMounted(() => getCategories())
           <p v-if="!isGetting" class="error-message">{{ errors?.Title }}</p>
 
           <label for="description">Description</label>
-          <p
-            v-if="isGetting"
-            class="bg-gray-300 mb-3 mt-1 h-40 w-full rounded-md animate-pulse"
-          ></p>
+          <p v-if="isGetting" class="textarea-shimmer"></p>
           <Field v-if="!isGetting" v-model="description" v-slot="{ field }" name="Description">
             <textarea
               v-bind="field"
@@ -252,10 +243,7 @@ onMounted(() => getCategories())
             <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
           </label>
           <div v-if="imageUrl" class="relative mt-4 w-24 h-24">
-            <XMarkIcon
-              class="absolute w-7 p-1 bg-red-500 hover:bg-red-600 cursor-pointer rounded-full -top-2 -right-2 text-white"
-              @click="removeImage()"
-            />
+            <XMarkIcon class="remove-image" @click="removeImage()" />
             <img
               :src="imageUrl"
               alt="Uploaded Image"
@@ -269,10 +257,7 @@ onMounted(() => getCategories())
         </div>
         <div class="flex-1">
           <label for="category">Category</label>
-          <p
-            v-if="isGetting"
-            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
-          ></p>
+          <p v-if="isGetting" class="input-shimmer"></p>
           <Field v-if="!isGetting" v-model="category" v-slot="{ field }" name="Category">
             <select v-bind="field" id="category" class="input" placeholder="Enter Your Category">
               <option v-for="c in categories" :key="c._id" :value="c._id">{{ c.title }}</option>
@@ -281,10 +266,7 @@ onMounted(() => getCategories())
           <p v-if="!isGetting" class="error-message">{{ errors?.Category }}</p>
 
           <label for="price">Price</label>
-          <p
-            v-if="isGetting"
-            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
-          ></p>
+          <p v-if="isGetting" class="input-shimmer"></p>
           <Field
             v-if="!isGetting"
             v-model="price"
@@ -297,10 +279,7 @@ onMounted(() => getCategories())
           <p v-if="!isGetting" class="error-message">{{ errors?.Price }}</p>
 
           <label for="quantity">Quantity</label>
-          <p
-            v-if="isGetting"
-            class="bg-gray-300 mb-3 mt-1 h-16 w-full rounded-md animate-pulse"
-          ></p>
+          <p v-if="isGetting" class="input-shimmer"></p>
           <Field
             v-if="!isGetting"
             v-model="quantity"

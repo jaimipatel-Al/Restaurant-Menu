@@ -66,12 +66,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover">
+  <section class="bg-screen">
     <div class="flex-between px-8 py-5">
       <h1 class="auth-title">Items</h1>
-      <RouterLink to="/item/add-item" class="button flex items-center"
-        ><PlusIcon class="w-12 mr-2" /> Add Item</RouterLink
-      >
+      <RouterLink to="/item/add-item" class="add-btn"><PlusIcon /> Add Item</RouterLink>
     </div>
     <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-6 mx-3" /> Loading...</div>
     <div v-else-if="items?.length == 0" class="no-data">
@@ -81,7 +79,7 @@ onMounted(() => {
       <div
         v-for="i in items"
         :key="i"
-        class="p-2 shadow shadow-2xl rounded rounded-xl w-80 my-5 mx-3"
+        class="p-2 shadow-2xl rounded-xl w-80 my-5 mx-3"
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="h-72">

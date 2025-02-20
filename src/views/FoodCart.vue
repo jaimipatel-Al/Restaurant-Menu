@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover"></section>
+  <section class="bg-screen"></section>
 </template>
 
 <style scoped>

@@ -54,7 +54,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="w-screen h-screen bg-cover">
+  <section class="bg-screen">
     <div v-if="isMenuLoading || isItemLoading" class="no-data">
       <ArrowPathIcon class="w-12 mx-3" /> Loading...
     </div>

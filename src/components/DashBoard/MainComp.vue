@@ -42,7 +42,7 @@
           <img
             src="@/assets/img/noodles.png"
             alt="Noodles"
-            class="rounded rounded-xl rounded-b h-80"
+            class="rounded-xl rounded-b h-80"
             style="width: 100%"
           />
           <h2 class="home-page-semi-title my-4">Noodles</h2>
@@ -56,7 +56,7 @@
           <img
             src="@/assets/img/jalebi.jpg"
             alt="Jalebi"
-            class="rounded rounded-xl rounded-b h-80"
+            class="rounded-xl rounded-b h-80"
             style="width: 100%"
           />
           <h2 class="home-page-semi-title my-4">Jalebi</h2>
@@ -70,7 +70,7 @@
           <img
             src="@/assets/img/dahi-puri.jpg"
             alt="Dahi Puri"
-            class="rounded rounded-xl rounded-b h-80"
+            class="rounded-xl rounded-b h-80"
             style="width: 100%"
           />
           <h2 class="home-page-semi-title my-4">Dahi Puri</h2>
