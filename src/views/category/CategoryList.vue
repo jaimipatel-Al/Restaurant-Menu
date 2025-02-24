@@ -104,7 +104,7 @@ onMounted(() => {
             @deleteItem="deleteCategory(c)"
             :isDeleting="c.isDeleting"
           />
-          <RouterLink :to="`/item`" class="text-orange-400 text-sm">Show Items</RouterLink>
+          <!-- <RouterLink :to="`/item`" class="text-orange-400 text-sm">Show Items</RouterLink> -->
           <p class="auth-detail">{{ c.description }}</p>
         </div>
       </div>

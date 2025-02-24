@@ -89,7 +89,7 @@ onMounted(() => {
       ref="scrollComponent"
       class="h-5/6 overflow-y-auto flex justify-evenly px-4 sm:px-8 md:px-10 flex-wrap"
     >
-      <div v-if="items?.length == 0 && !isLoading" class="no-data">
+      <div v-if="items?.length == 0 && !isLoading" class="no-data items-start">
         <NoSymbolIcon class="no-data-icon" /> No Item Available
       </div>
       <div
@@ -139,7 +139,7 @@ onMounted(() => {
           <p class="auth-detail">{{ i.description }}</p>
         </div>
       </div>
-      <div v-if="isLoading" class="no-data shrink w-full">
+      <div v-if="isLoading" class="no-data items-start shrink w-full">
         <ArrowPathIcon class="loading-btn" /> Loading...
       </div>
     </div>
