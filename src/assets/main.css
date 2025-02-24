@@ -60,19 +60,19 @@
     }
 
     .sub-title {
-        @apply text-gray-800 sm:text-2xl font-bold hover:text-gray-600
+        @apply text-gray-800 text-base sm:text-2xl font-bold hover:text-gray-600
     }
 
     .main-heading {
-        @apply sub-title text-center shadow-2xl bg-orange-200 p-5 my-5
+        @apply sub-title text-center shadow-2xl bg-orange-200 p-2 sm:p-4 md:p-5 my-1 sm:my-2 md:my-4 lg:my-5
     }
 
     .sub-heading {
-        @apply text-3xl font-bold
+        @apply text-xl sm:text-2xl md:text-3xl font-bold
     }
 
     .auth-detail {
-        @apply text-gray-600 font-semibold text-sm sm:text-base mb-5
+        @apply text-gray-600 font-semibold text-sm sm:text-base mb-3 sm:mb-4 md:mb-5
     }
 
     .auth label {
@@ -80,7 +80,7 @@
     }
 
     .input {
-        @apply border border-orange-200 rounded-md py-1.5 sm:py-2 px-2 sm:px-3 md:px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none w-full sm:text-lg
+        @apply border border-orange-200 rounded-md py-1.5 sm:py-2 px-2 sm:px-3 md:px-4 text-gray-900 placeholder:text-gray-400 focus:outline-none w-full text-sm sm:text-base md:text-lg
     }
 
     .error-message {
@@ -92,15 +92,15 @@
     }
 
     .add-edit-form label {
-        @apply block mt-3 font-semibold text-sm sm:text-lg
+        @apply block mt-1 sm:mt-2 md:mt-3 font-semibold text-xs sm:text-base md:text-lg
     }
 
     .add-edit-form button {
-        @apply button flex items-center justify-center w-full mt-10
+        @apply button flex items-center justify-center w-full mt-3 sm:mt-5 md:mt-10
     }
 
     .upload-button {
-        @apply w-8 border border-orange-600 p-1.5 text-orange-600 rounded-full cursor-pointer hover:bg-orange-600 hover:text-white transition duration-100 ease-in
+        @apply w-6 sm:w-8 border border-orange-600 p-1 sm:p-1.5 text-orange-600 rounded-full cursor-pointer hover:bg-orange-600 hover:text-white transition duration-100 ease-in
     }
 
     .action-btn {
@@ -131,8 +131,12 @@
         @apply rounded-xl full-image
     }
 
+    .uploaded-img-box {
+        @apply full-image rounded-lg border border-gray-300
+    }
+
     .shimmer {
-        @apply bg-gray-300 mb-3 mt-1 w-full rounded-md animate-pulse
+        @apply bg-gray-300 mb-1 sm:mb-2 md:mb-3 mt-1 w-full rounded-md animate-pulse
     }
 
     .input-shimmer {
@@ -148,11 +152,11 @@
     }
 
     .add-btn {
-        @apply bg-orange-700 font-semibold text-white disabled:bg-orange-400 hover:bg-orange-500 rounded-md flex items-center py-1 px-2 md:py-2 md:px-3 transition duration-200 ease-in
+        @apply bg-orange-700 font-semibold text-white disabled:bg-orange-400 hover:bg-orange-500 rounded-md flex items-center py-1 px-2 md:py-2 md:px-3 transition duration-200 ease-in text-xs sm:text-sm md:text-base
     }
 
     .add-btn svg {
-        @apply w-6 mr-2
+        @apply w-4 md:w-6 mr-1 md:mr-2
     }
 
     .remove-image {
@@ -182,6 +186,16 @@
     .sidebar a {
         @apply py-2 px-5 block text-white font-semibold hover:bg-orange-50
     }
+
+    .quantity-cls {
+        @apply text-xs md:text-sm text-green-700
+    }
+
+    .table-pad {
+        @apply py-2 sm:py-3 md:py-5 px-2 sm:px-4 md:px-10
+    }
+
+
 }
 
 .auth {

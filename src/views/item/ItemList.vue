@@ -13,15 +13,24 @@ const authStore = useAuthStore()
 
 const isLoading = ref(false)
 const items = ref([])
+const scrollComponent = ref()
+const page = ref(0)
+const totalItems = ref()
 
 const getItems = async () => {
+  if (items.value?.length == totalItems.value) return
+
+  page.value++
   isLoading.value = true
 
-  await Axios.get(api.listItem)
+  await Axios.get(`${api.listItem}?page=${page.value}&limit=8`)
     .then(({ data }) => {
-      items.value = data?.data?.subcategories?.map((e) => {
+      const res = data.data
+      totalItems.value = res.totalSubcategories
+      const arr = res.subcategories.map((e) => {
         return { ...e, isDeleting: false }
       })
+      items.value = [...items.value, ...arr]
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -36,6 +45,9 @@ const deleteItem = async (data) => {
   await Axios.delete(`${api.deleteItem}${data._id}`)
     .then(() => {
       toast.success('Item deleted successfully!!')
+      page.value = 0
+      totalItems.value = null
+      items.value = []
       getItems()
     })
     .catch((er) => {
@@ -55,8 +67,15 @@ const availableItem = async (data) => {
     })
 }
 
+const handleScroll = () => {
+  const el = scrollComponent.value
+  if (!el) return
+  if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50 && !isLoading.value) getItems()
+}
+
 onMounted(() => {
   getItems()
+  scrollComponent.value.addEventListener('scroll', handleScroll)
 })
 </script>
 
@@ -66,19 +85,27 @@ onMounted(() => {
       <h1 class="main-title">Items</h1>
       <RouterLink to="/item/add-item" class="add-btn"><PlusIcon /> Add Item</RouterLink>
     </div>
-    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="loading-btn" /> Loading...</div>
-    <div v-else-if="items?.length == 0" class="no-data">
-      <NoSymbolIcon class="no-data-icon" /> No Item Available
-    </div>
-    <div v-else class="h-5/6 overflow-y-auto flex justify-evenly px-4 sm:px-8 md:px-10 flex-wrap">
+    <div
+      ref="scrollComponent"
+      class="h-5/6 overflow-y-auto flex justify-evenly px-4 sm:px-8 md:px-10 flex-wrap"
+    >
+      <div v-if="items?.length == 0 && !isLoading" class="no-data">
+        <NoSymbolIcon class="no-data-icon" /> No Item Available
+      </div>
       <div
+        v-else
         v-for="i in items"
         :key="i"
-        class="p-2 shadow-2xl rounded-xl w-full sm:w-80 my-5 mx-3"
+        class="p-1 sm:p-2 shadow-2xl rounded-xl w-full sm:w-80 my-2 md:my-4 lg:my-5 mx-2 md:mx-3"
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="h-72">
-          <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
+          <img
+            v-if="i.image && i.image != 'null' && i.image != 'undefined'"
+            :src="i.image"
+            alt="Item Image"
+            class="uploaded-image"
+          />
           <img v-else src="@/assets/img/default-item.jpg" alt="Item Image" class="uploaded-image" />
         </div>
         <div class="p-2">
@@ -91,7 +118,7 @@ onMounted(() => {
           />
           <label
             :for="`available-${i._id}`"
-            class="flex items-center text-sm sm:text-base font-semibold"
+            class="flex items-center sm:text-sm md:text-base font-semibold"
           >
             <input
               v-model="i.isActive"
@@ -111,6 +138,9 @@ onMounted(() => {
           <p class="text-sm font-semibold text-gray-800">Quantity : {{ i.quantity }}</p>
           <p class="auth-detail">{{ i.description }}</p>
         </div>
+      </div>
+      <div v-if="isLoading" class="no-data shrink w-full">
+        <ArrowPathIcon class="loading-btn" /> Loading...
       </div>
     </div>
   </section>

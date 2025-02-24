@@ -112,23 +112,13 @@ const getCategories = async () => {
 const addItem = async () => {
   isLoading.value = true
 
-  let formData
-  if (file.value) {
-    formData = new FormData()
-    formData.append('title', title.value)
-    formData.append('description', description.value)
-    formData.append('image', image.value)
-    formData.append('categoryId', category.value)
-    formData.append('price', price.value)
-    formData.append('quantity', quantity.value)
-  } else
-    formData = {
-      title: title.value,
-      description: description.value,
-      categoryId: category.value,
-      price: price.value,
-      quantity: quantity.value,
-    }
+  let formData = new FormData()
+  formData.append('title', title.value)
+  formData.append('description', description.value)
+  if (image.value) formData.append('image', image.value)
+  formData.append('categoryId', category.value)
+  formData.append('price', price.value)
+  formData.append('quantity', quantity.value)
 
   await Axios.post(api.createItem, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -147,25 +137,14 @@ const addItem = async () => {
 const editItem = async () => {
   isLoading.value = true
 
-  let formData
-  if (file.value) {
-    formData = new FormData()
-    formData.append('title', title.value)
-    formData.append('description', description.value)
-    formData.append('image', image.value)
-    formData.append('categoryId', category.value)
-    formData.append('price', price.value)
-    formData.append('quantity', quantity.value)
-    formData.append('isActive', isActive.value)
-  } else
-    formData = {
-      title: title.value,
-      description: description.value,
-      categoryId: category.value,
-      price: price.value,
-      quantity: quantity.value,
-      isActive: isActive.value,
-    }
+  let formData = new FormData()
+  formData.append('title', title.value)
+  formData.append('description', description.value)
+  if (image.value || (!imageUrl.value && !image.value)) formData.append('image', image.value)
+  formData.append('categoryId', category.value)
+  formData.append('price', price.value)
+  formData.append('quantity', quantity.value)
+  formData.append('isActive', isActive.value)
 
   await Axios.put(`${api.updateItem}${id.value}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -195,7 +174,10 @@ onMounted(() => getCategories())
 
 <template>
   <section class="bg-screen add-edit-form">
-    <div class="md:w-5/6 shadow-2xl my-8 p-8 mx-auto" style="background: rgb(250, 200, 200, 0.25)">
+    <div
+      class="w-full md:w-5/6 shadow-2xl my-4 sm:my-6 md:my-8 p-4 sm:p-6 md:p-8 mx-auto"
+      style="background: rgb(250, 200, 200, 0.25)"
+    >
       <h1 class="main-title">{{ id ? 'Update ' : 'Add ' }} Item</h1>
       <p class="auth-detail">
         {{
@@ -209,9 +191,9 @@ onMounted(() => getCategories())
         @submit="id ? editItem() : addItem()"
         :validation-schema="schema"
         v-slot="{ errors }"
-        class="flex space-x-10"
+        class="flex flex-col sm:flex-row flex-wrap"
       >
-        <div class="flex-1">
+        <div class="w-full sm:w-1/2 p-0 sm:px-2">
           <label for="title">Title</label>
           <p v-if="isGetting" class="input-shimmer"></p>
           <Field
@@ -224,7 +206,18 @@ onMounted(() => getCategories())
             placeholder="Enter Your Title"
           />
           <p v-if="!isGetting" class="error-message">{{ errors?.Title }}</p>
-
+        </div>
+        <div class="w-full sm:w-1/2 p-0 sm:px-2">
+          <label for="category">Category</label>
+          <p v-if="isGetting" class="input-shimmer"></p>
+          <Field v-if="!isGetting" v-model="category" v-slot="{ field }" name="Category">
+            <select v-bind="field" id="category" class="input" placeholder="Enter Your Category">
+              <option v-for="c in categories" :key="c._id" :value="c._id">{{ c.title }}</option>
+            </select>
+          </Field>
+          <p v-if="!isGetting" class="error-message">{{ errors?.Category }}</p>
+        </div>
+        <div class="w-full sm:w-1/2 p-0 sm:px-2">
           <label for="description">Description</label>
           <p v-if="isGetting" class="textarea-shimmer"></p>
           <Field v-if="!isGetting" v-model="description" v-slot="{ field }" name="Description">
@@ -236,36 +229,8 @@ onMounted(() => getCategories())
             ></textarea>
           </Field>
           <p v-if="!isGetting" class="error-message">{{ errors?.Description }}</p>
-
-          <label v-if="!isGetting" for="image" style="display: flex" class="items-center">
-            Upload Image
-            <ArrowUpTrayIcon class="upload-button mx-2" v-if="!imageUrl" @click="file.click()" />
-            <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
-          </label>
-          <div v-if="imageUrl" class="relative mt-4 w-24 h-24">
-            <XMarkIcon class="remove-image" @click="removeImage()" />
-            <img
-              :src="imageUrl"
-              alt="Uploaded Image"
-              class="full-image rounded-lg border border-gray-300"
-            />
-          </div>
-
-          <button type="submit" :disabled="isLoading">
-            {{ id ? 'Edit ' : 'Add ' }} Item
-            <ArrowPathIcon v-if="isLoading" class="loading-btn" />
-          </button>
         </div>
-        <div class="flex-1">
-          <label for="category">Category</label>
-          <p v-if="isGetting" class="input-shimmer"></p>
-          <Field v-if="!isGetting" v-model="category" v-slot="{ field }" name="Category">
-            <select v-bind="field" id="category" class="input" placeholder="Enter Your Category">
-              <option v-for="c in categories" :key="c._id" :value="c._id">{{ c.title }}</option>
-            </select>
-          </Field>
-          <p v-if="!isGetting" class="error-message">{{ errors?.Category }}</p>
-
+        <div class="w-full sm:w-1/2 p-0 sm:px-2">
           <label for="price">Price</label>
           <p v-if="isGetting" class="input-shimmer"></p>
           <Field
@@ -291,7 +256,22 @@ onMounted(() => getCategories())
             placeholder="Enter Your Quantity"
           />
           <p v-if="!isGetting" class="error-message">{{ errors?.Quantity }}</p>
-
+        </div>
+        <div class="w-full sm:w-1/2 p-0 sm:px-2">
+          <label v-if="!isGetting" for="image" style="display: flex" class="items-center">
+            Upload Image
+            <ArrowUpTrayIcon class="upload-button mx-2" v-if="!imageUrl" @click="file.click()" />
+            <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
+          </label>
+          <div
+            v-if="imageUrl"
+            class="relative mt-2 sm:mt-2 md:mt-4 w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24"
+          >
+            <XMarkIcon class="remove-image" @click="removeImage()" />
+            <img :src="imageUrl" alt="Uploaded Image" class="uploaded-img-box" />
+          </div>
+        </div>
+        <div class="w-full sm:w-1/2 p-0 sm:px-2 mt-1">
           <label
             v-if="id && !isGetting"
             for="available"
@@ -306,6 +286,10 @@ onMounted(() => getCategories())
             Available
           </label>
         </div>
+        <button class="w-full sm:w-1/2 shrink" type="submit" :disabled="isLoading">
+          {{ id ? 'Edit ' : 'Add ' }} Item
+          <ArrowPathIcon v-if="isLoading" class="loading-btn" />
+        </button>
       </Form>
     </div>
   </section>

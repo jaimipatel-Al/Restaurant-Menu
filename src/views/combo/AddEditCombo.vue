@@ -28,6 +28,10 @@ const schema = yup.object({
 const id = computed(() => route?.params?.id)
 
 const items = ref([])
+const scrollComponent = ref()
+const page = ref(0)
+const totalItems = ref()
+
 const selectedItem = ref([])
 const title = ref('')
 const price = ref()
@@ -65,11 +69,17 @@ const addItem = (i) => {
 }
 
 const getItems = async () => {
+  if (items.value?.length == totalItems.value) return
+
+  page.value++
   isItemLoading.value = true
 
-  await Axios.get(api.listItem)
+  await Axios.get(`${api.listItem}?page=${page.value}&limit=16`)
     .then(({ data }) => {
-      items.value = data?.data?.subcategories
+      const res = data.data
+      totalItems.value = res.totalSubcategories
+      const arr = res.subcategories ?? []
+      items.value = [...items.value, ...arr]
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -81,21 +91,12 @@ const getItems = async () => {
 const addCombo = async () => {
   isLoading.value = true
 
-  let formData
-  if (imageUrl.value) {
-    formData = new FormData()
-    formData.append('name', title.value)
-    formData.append('price', price.value)
-    formData.append('isTodayMenu', isTodayMenu.value)
-    formData.append('image', image.value)
-    selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
-  } else
-    formData = {
-      name: title.value,
-      price: price.value,
-      isTodayMenu: isTodayMenu.value,
-      subCategories: selectedItem.value.map((e) => e._id),
-    }
+  let formData = new FormData()
+  formData.append('name', title.value)
+  formData.append('price', price.value)
+  formData.append('isTodayMenu', isTodayMenu.value)
+  if (image.value) formData.append('image', image.value)
+  selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
 
   await Axios.post(api.createCombo, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -114,23 +115,13 @@ const addCombo = async () => {
 const editCombo = async () => {
   isLoading.value = true
 
-  let formData
-  if (file.value) {
-    formData = new FormData()
-    formData.append('name', title.value)
-    formData.append('price', price.value)
-    formData.append('isTodayMenu', isTodayMenu.value)
-    formData.append('isActive', isActive.value)
-    formData.append('image', image.value)
-    selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
-  } else
-    formData = {
-      name: title.value,
-      price: price.value,
-      isTodayMenu: isTodayMenu.value,
-      isActive: isActive.value,
-      subCategories: selectedItem.value.map((e) => e._id),
-    }
+  let formData = new FormData()
+  formData.append('name', title.value)
+  formData.append('price', price.value)
+  formData.append('isTodayMenu', isTodayMenu.value)
+  formData.append('isActive', isActive.value)
+  if (image.value || (!imageUrl.value && !image.value)) formData.append('image', image.value)
+  selectedItem.value.forEach((e, i) => formData.append(`subCategories[${i}]`, e._id))
 
   await Axios.put(`${api.updateCombo}${id.value}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -168,6 +159,12 @@ const getComboDetail = async () => {
     })
 }
 
+const handleScroll = () => {
+  const el = scrollComponent.value
+  if (!el) return
+  if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50 && !isItemLoading.value) getItems()
+}
+
 watch(
   id,
   () => {
@@ -178,16 +175,17 @@ watch(
 
 onMounted(() => {
   getItems()
+  scrollComponent.value.addEventListener('scroll', handleScroll)
 })
 </script>
 
 <template>
   <section class="bg-screen flex items-center justify-end add-edit-form">
     <div
-      class="w-full h-5/6 shadow-2xl mx-10 py-3 sm:py-4 md:py-5 px-4 sm:px-8 md:px-10 flex"
+      class="w-full h-5/6 shadow-2xl mx-4 sm:mx-6 md:mx-6 lg:mx-10 py-3 sm:py-4 md:py-5 px-4 sm:px-8 md:px-10 flex flex-col sm:flex-row"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
-      <div class="w-96 flex-none">
+      <div class="w-full sm:w-96 flex-none">
         <h1 class="main-title">{{ id ? 'Update ' : 'Add ' }} Combo</h1>
         <p class="auth-detail">
           Make Combo, A perfect mix of tasty snacks and hearty meals.
@@ -222,7 +220,7 @@ onMounted(() => {
             class="input"
             placeholder="Enter Your Price"
           />
-          <p v-if="selectedItem?.length && !isGetting" class="text-green-700 text-sm font-semibold">
+          <p v-if="selectedItem?.length && !isGetting" class="quantity-cls font-semibold">
             Total price of selected item : {{ totalPrice }}
           </p>
           <p v-if="!isGetting" class="error-message">{{ errors?.Price }}</p>
@@ -250,13 +248,12 @@ onMounted(() => {
             <ArrowUpTrayIcon class="upload-button mx-2" v-if="!imageUrl" @click="file.click()" />
             <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
           </label>
-          <div v-if="imageUrl && !isGetting" class="relative mt-4 w-24 h-24">
+          <div
+            v-if="imageUrl && !isGetting"
+            class="relative mt-2 sm:mt-2 md:mt-4 w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24"
+          >
             <XMarkIcon class="remove-image" @click="removeImage()" />
-            <img
-              :src="imageUrl"
-              alt="Uploaded Image"
-              class="full-image rounded-lg border border-gray-300"
-            />
+            <img :src="imageUrl" alt="Uploaded Image" class="uploaded-img-box" />
           </div>
 
           <button type="submit" :disabled="isLoading || isGetting || items?.length == 0">
@@ -265,16 +262,17 @@ onMounted(() => {
           </button>
         </Form>
       </div>
-      <div class="ml-3 w-full">
-        <div v-if="isItemLoading || isGetting" class="no-data">
-          <ArrowPathIcon class="loading-btn" /> Loading...
-        </div>
-        <div v-else-if="items?.length == 0" class="no-data">
-          <NoSymbolIcon class="no-data-icon" /> No Item Available
-          <RouterLink to="/item/add-item" class="route-link ml-2"> Add items</RouterLink>
-        </div>
-        <div v-else class="flex flex-wrap items-start justify-start overflow-y-auto h-full">
+      <div class="sm:ml-2 md:ml-3 w-full">
+        <div
+          ref="scrollComponent"
+          class="flex flex-nowrap sm:flex-wrap items-start justify-start overflow-x-auto sm:overflow-y-auto h-full"
+        >
+          <div v-if="items?.length == 0 && !isItemLoading && !isGetting" class="no-data">
+            <NoSymbolIcon class="no-data-icon" /> No Item Available
+            <RouterLink to="/item/add-item" class="route-link ml-2"> Add items</RouterLink>
+          </div>
           <ComboItems
+            v-else-if="!isGetting"
             v-for="i in items"
             :key="i"
             :item="i"
@@ -282,6 +280,9 @@ onMounted(() => {
             :isRemove="selectedItem.find((e) => e?._id == i?._id)"
             :class="{ 'active-item relative': selectedItem.find((e) => e?._id == i?._id) }"
           />
+          <div v-if="isItemLoading || isGetting" class="no-data">
+            <ArrowPathIcon class="loading-btn" /> Loading...
+          </div>
         </div>
       </div>
     </div>

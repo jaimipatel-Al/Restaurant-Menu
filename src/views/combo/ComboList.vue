@@ -14,15 +14,24 @@ const authStore = useAuthStore()
 
 const isLoading = ref(false)
 const combos = ref([])
+const scrollComponent = ref()
+const page = ref(0)
+const totalCombos = ref()
 
 const getCombo = async () => {
+  if (combos.value?.length == totalCombos.value) return
+
+  page.value++
   isLoading.value = true
 
-  await Axios.get(api.listCombo)
+  await Axios.get(`${api.listCombo}?page=${page.value}&limit=4`)
     .then(({ data }) => {
-      combos.value = data?.data?.menus?.map((e) => {
+      const res = data.data
+      totalCombos.value = res.totalMenus
+      const arr = res.menus.map((e) => {
         return { ...e, isDeleting: false }
       })
+      combos.value = [...combos.value, ...arr]
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -37,6 +46,9 @@ const deleteCombo = async (data) => {
   await Axios.delete(`${api.deleteCombo}${data._id}`)
     .then(() => {
       toast.success('Combo deleted successfully!!')
+      page.value = 0
+      totalCombos.value = null
+      combos.value = []
       getCombo()
     })
     .catch((er) => {
@@ -59,6 +71,9 @@ const todayCombo = async (data) => {
   await Axios.post(`${api.selectToday}${data._id}`)
     .then(() => {
       toast.success("Combo's Today's Special Option Changed successfully!!")
+      page.value = 0
+      totalCombos.value = null
+      combos.value = []
       getCombo()
       isLoading.value = false
     })
@@ -67,8 +82,15 @@ const todayCombo = async (data) => {
     })
 }
 
+const handleScroll = () => {
+  const el = scrollComponent.value
+  if (!el) return
+  if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50 && !isLoading.value) getCombo()
+}
+
 onMounted(() => {
   getCombo()
+  scrollComponent.value.addEventListener('scroll', handleScroll)
 })
 </script>
 
@@ -78,12 +100,12 @@ onMounted(() => {
       <h1 class="main-title">Combo</h1>
       <RouterLink to="/combo/add-combo" class="add-btn"><PlusIcon /> Add Combo</RouterLink>
     </div>
-    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="no-data-icon" /> Loading...</div>
-    <div v-else-if="combos?.length == 0" class="no-data">
-      <NoSymbolIcon class="no-data-icon" /> No Combo Available
-    </div>
-    <div v-else class="h-5/6 overflow-y-auto">
+    <div ref="scrollComponent" class="h-5/6 overflow-y-auto">
+      <div v-if="combos?.length == 0 && !isLoading" class="no-data">
+        <NoSymbolIcon class="no-data-icon" /> No Combo Available
+      </div>
       <div
+        v-else
         v-for="(m, i) in combos"
         :key="m._id"
         class="sm:grid grid-cols-3 grid-rows-3 grid-container pa-10 shadow-2xl"
@@ -96,7 +118,12 @@ onMounted(() => {
             i % 2 == 1 ? 'col-start-3 col-end-4  flex-none' : ''
           }`"
         >
-          <img v-if="m.image" :src="m.image" alt="Combo Image" class="full-image" />
+          <img
+            v-if="m.image && m.image != 'null' && m.image != 'undefined'"
+            :src="m.image"
+            alt="Combo Image"
+            class="full-image"
+          />
           <img v-else src="@/assets/img/default-combo.jpg" class="full-image" alt="Combo Image" />
         </div>
         <div
@@ -112,10 +139,10 @@ onMounted(() => {
             :isDeleting="m.isDeleting"
           />
           <p class="price">₹ {{ m.price }} /-</p>
-          <div class="flex items-start justify-between flex-wrap pt-3 sm:pt-4 md:pt-5">
+          <div class="flex items-start justify-between flex-wrap pt-1 sm:pt-3 md:pt-5">
             <label
               :for="`available-${m._id}`"
-              class="flex items-center font-semibold text-sm sm:text-base md:text-xl"
+              class="flex items-center font-semibold text-xs sm:text-base md:text-xl"
             >
               <input
                 v-model="m.isActive"
@@ -128,7 +155,7 @@ onMounted(() => {
             </label>
             <label
               :for="`today-combo-${m._id}`"
-              class="flex font-semibold text-sm sm:text-base md:text-xl"
+              class="flex font-semibold text-xs sm:text-base md:text-xl"
             >
               <input
                 v-model="m.isTodayMenu"
@@ -153,6 +180,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
+      <div v-if="isLoading" class="no-data"><ArrowPathIcon class="no-data-icon" /> Loading...</div>
     </div>
   </section>
 </template>

@@ -1,6 +1,6 @@
 <script setup>
 import { ArrowPathIcon, NoSymbolIcon } from '@heroicons/vue/24/solid'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { useRoute } from 'vue-router'
@@ -15,23 +15,38 @@ const cartStore = useCartStore()
 const id = computed(() => route?.params?.id)
 
 const isMenuLoading = ref(false)
-const isItemLoading = ref(false)
 const menus = ref([])
+const scrollMenuComponent = ref()
+const menuPage = ref(0)
+const totalMenuItems = ref()
+
+const isItemLoading = ref(false)
 const items = ref([])
+const itemPage = ref(0)
+const totalItems = ref()
+
 const todaySpecial = ref(null)
 const cart = ref([])
 
 const getCustomerMenu = async () => {
+  if (menus.value?.length == totalMenuItems.value) return
+
+  menuPage.value++
   isMenuLoading.value = true
 
-  await Axios.get(`${api.customerMenu}${id.value}?page=1&limit=100`)
+  await Axios.get(`${api.customerMenu}${id.value}?page=${menuPage.value}&limit=8`)
     .then(({ data }) => {
-      menus.value = data?.data?.menus?.map((e) => {
+      const res = data.data
+      totalMenuItems.value = res.total
+      if (menuPage.value == 1)
+        todaySpecial.value = res?.todaySpecial
+          ? { ...data.data.todaySpecial, isCartLoading: false }
+          : null
+
+      const arr = res.menus.map((e) => {
         return { ...e, isCartLoading: false }
       })
-      todaySpecial.value = data?.data?.todaySpecial
-        ? { ...data.data.todaySpecial, isCartLoading: false }
-        : null
+      menus.value = [...menus.value, ...arr]
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -41,13 +56,19 @@ const getCustomerMenu = async () => {
     })
 }
 const getCustomerItems = async () => {
+  if (items.value?.length == totalItems.value) return
+
+  itemPage.value++
   isItemLoading.value = true
 
-  await Axios.get(`${api.customerItems}${id.value}?page=1&limit=100`)
+  await Axios.get(`${api.customerItems}${id.value}?page=${itemPage.value}&limit=10`)
     .then(({ data }) => {
-      items.value = data?.data?.items?.map((e) => {
+      const res = data.data
+      totalItems.value = res.total
+      const arr = res.items.map((e) => {
         return { ...e, isCartLoading: false }
       })
+      items.value = [...items.value, ...arr]
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -135,10 +156,28 @@ const removeFromCart = async (payload) => {
     })
 }
 
+const handleMenuScroll = () => {
+  const el = scrollMenuComponent.value
+  if (!el) return
+  if (el.scrollWidth - el.scrollLeft <= el.clientWidth + 50 && !isMenuLoading.value)
+    getCustomerMenu()
+}
+const handleWindowScroll = () => {
+  if (isItemLoading.value) return
+  if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50)
+    getCustomerItems()
+}
+
 onMounted(() => {
   getCustomerMenu()
   getCustomerItems()
   getCart()
+
+  scrollMenuComponent.value.addEventListener('scroll', handleMenuScroll)
+  window.addEventListener('scroll', handleWindowScroll)
+})
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleWindowScroll)
 })
 </script>
 
@@ -147,19 +186,28 @@ onMounted(() => {
     <div class="px-8 py-5 text-center">
       <h1 class="main-title">Restaurant Menu</h1>
     </div>
-    <div v-if="isMenuLoading || isItemLoading" class="no-data">
-      <ArrowPathIcon class="no-data-icon" /> Loading...
-    </div>
-    <div v-else-if="menus?.length == 0 && items?.length == 0" class="no-data">
+    <div
+      v-if="menus?.length == 0 && items?.length == 0 && !isItemLoading && !isMenuLoading"
+      class="no-data"
+    >
       <NoSymbolIcon class="no-data-icon" /> No Menu Available For This Restaurants
     </div>
-    <div v-else>
+    <div v-if="isMenuLoading" class="no-data">
+      <ArrowPathIcon class="no-data-icon" /> Loading...
+    </div>
+    <div>
       <div v-if="todaySpecial">
         <h2 class="main-heading">Today's Special Food Combos</h2>
-        <div class="p-10 my-10 w-full flex-between flex-col md:flex-row cursor-pointer space-x-10">
-          <div class="h-96 w-1/3">
+        <div
+          class="pa-10 my-4 md:my-8 lg:my-10 w-full flex-between flex-col md:flex-row cursor-pointer md:space-x-10"
+        >
+          <div class="h-52 sm:h-72 md:h-96 w-full md:w-1/3">
             <img
-              v-if="todaySpecial.image"
+              v-if="
+                todaySpecial.image &&
+                todaySpecial.image != 'null' &&
+                todaySpecial.image != 'undefined'
+              "
               :src="todaySpecial.image"
               alt="Item Image"
               class="uploaded-image"
@@ -171,16 +219,14 @@ onMounted(() => {
               class="uploaded-image"
             />
           </div>
-          <div class="w-2/3">
-            <div class="p-3 font-bold text-xl flex-between">
+          <div class="w-full md:w-2/3">
+            <div class="p-1 sm:p-2 md:p-3 flex-between">
               <div>
                 <h3 class="sub-heading">
                   {{ todaySpecial.name }}
                 </h3>
                 <p class="price">₹ {{ todaySpecial.price }} /-</p>
-                <p class="text-sm text-green-700">
-                  Quantity : {{ todaySpecial.subCategories?.length }}
-                </p>
+                <p class="quantity-cls">Quantity : {{ todaySpecial.subCategories?.length }}</p>
               </div>
               <div>
                 <button
@@ -189,7 +235,7 @@ onMounted(() => {
                   class="add-btn"
                   @click="addMenuToCart(todaySpecial, true)"
                 >
-                  <ArrowPathIcon v-if="todaySpecial.isCartLoading" class="w-6 mr-1" /> Add To Cart
+                  <ArrowPathIcon v-if="todaySpecial.isCartLoading" /> Add To Cart
                 </button>
                 <AddToCart
                   v-else
@@ -207,15 +253,23 @@ onMounted(() => {
         </div>
       </div>
       <h2 v-if="menus?.length" class="main-heading">Food Combos</h2>
-      <div class="flex items-start justify-start overflow-x-auto w-full p-5">
+      <div
+        ref="scrollMenuComponent"
+        class="flex items-center justify-start overflow-x-auto w-full p-2 sm:p-3 md:p-5"
+      >
         <div
           v-for="m in menus"
           :key="m"
-          class="p-2 shadow-2xl rounded-xl w-96 flex-none my-2 mx-4 cursor-pointer"
+          class="p-1 md:p-2 shadow-2xl rounded-xl flex-none cursor-pointer my-1 md:my-2 mx-2 md:mx-4 w-64 sm:w-72 md:w-80 lg:w-96"
           style="background: rgb(255, 255, 255, 0.8)"
         >
-          <div class="h-72">
-            <img v-if="m.image" :src="m.image" alt="Item Image" class="uploaded-image" />
+          <div class="h-52 sm:h-56 md:h-64 lg:h-72">
+            <img
+              v-if="m.image && m.image != 'null' && m.image != 'undefined'"
+              :src="m.image"
+              alt="Item Image"
+              class="uploaded-image"
+            />
             <img
               v-else
               src="@/assets/img/default-item.jpg"
@@ -223,12 +277,12 @@ onMounted(() => {
               class="uploaded-image"
             />
           </div>
-          <div class="p-3">
+          <div class="p-1 sm:p-2 md:p-3">
             <h3 class="sub-title flex justify-between">
               {{ m.name }}
               <span class="price">₹ {{ m.price }} /-</span>
             </h3>
-            <p class="text-sm text-green-700 mb-2">Quantity : {{ m.subCategories?.length }}</p>
+            <p class="quantity-cls mb-1 md:mb-2">Quantity : {{ m.subCategories?.length }}</p>
 
             <button
               :disabled="m.isCartLoading"
@@ -236,7 +290,7 @@ onMounted(() => {
               class="add-btn"
               @click="addMenuToCart(m)"
             >
-              <ArrowPathIcon v-if="m.isCartLoading" class="w-6 mr-1" /> Add To Cart
+              <ArrowPathIcon v-if="m.isCartLoading" /> Add To Cart
             </button>
             <AddToCart
               v-else
@@ -247,18 +301,26 @@ onMounted(() => {
             />
           </div>
         </div>
+        <div v-if="menus?.length && isMenuLoading" class="no-data">
+          <ArrowPathIcon class="no-data-icon" /> Loading...
+        </div>
       </div>
       <h2 v-if="items?.length" class="main-heading">Food Items</h2>
-      <div class="h-5/6 overflow-y-auto flex justify-evenly items-start flex-wrap my-10">
+      <div class="flex justify-evenly items-start flex-wrap my-2 md:my-6 lg:my-10">
         <div class="flex items-center justify-evenly flex-wrap">
           <div
             v-for="i in items"
             :key="i._id"
-            class="p-2 shadow-2xl rounded-xl w-72 my-4 mx-2"
+            class="p-1 md:p-2 shadow-2xl rounded-xl w-40 sm:w-56 md:w-64 lg:w-72 my-2 md:my-4 mx-1 md:mx-2"
             style="background: rgb(255, 255, 255, 0.8)"
           >
-            <div class="h-64">
-              <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
+            <div class="h-36 sm:h-40 md:h-56 lg:h-64">
+              <img
+                v-if="i.image && i.image != 'null' && i.image != 'undefined'"
+                :src="i.image"
+                alt="Item Image"
+                class="uploaded-image"
+              />
               <img
                 v-else
                 src="@/assets/img/default-item.jpg"
@@ -266,14 +328,14 @@ onMounted(() => {
                 class="uploaded-image"
               />
             </div>
-            <div class="p-3">
-              <h3 class="text-xl font-bold flex justify-between">
+            <div class="p-1 sm:p-2 md:p-3">
+              <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-bold flex justify-between">
                 {{ i.title }}
                 <span class="price">₹ {{ i.price }} /-</span>
               </h3>
-              <p class="flex justify-between mb-2">
-                <span class="text-sm text-green-700">Quantity : {{ i.quantity }}</span>
-                <span class="text-sm text-orange-700">{{ i.categoryId?.title }}</span>
+              <p class="flex justify-between mb-1 md:mb-2">
+                <span class="quantity-cls">Quantity : {{ i.quantity }}</span>
+                <span class="text-xs md:text-sm text-orange-700">{{ i.categoryId?.title }}</span>
               </p>
 
               <button
@@ -282,7 +344,7 @@ onMounted(() => {
                 class="add-btn"
                 @click="addItemToCart(i)"
               >
-                <ArrowPathIcon v-if="i.isCartLoading" class="w-6 mr-1" /> Add To Cart
+                <ArrowPathIcon v-if="i.isCartLoading" /> Add To Cart
               </button>
               <AddToCart
                 v-else
@@ -294,6 +356,9 @@ onMounted(() => {
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="items?.length && isItemLoading" class="no-data">
+        <ArrowPathIcon class="no-data-icon" /> Loading...
       </div>
     </div>
   </section>

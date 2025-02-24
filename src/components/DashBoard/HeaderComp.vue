@@ -29,7 +29,7 @@ const closeSidebar = () => {
 }
 
 onMounted(() => {
-  cartStore.getCartValue()
+  if (authStore.userData?.token) cartStore.getCartValue()
 })
 </script>
 
@@ -45,22 +45,22 @@ onMounted(() => {
       </h1>
     </div>
 
-    <div class="block sm:hidden flex items-center space-x-5 mr-5">
+    <div class="block sm:hidden flex items-center space-x-3 mr-5">
       <div
         v-if="authStore?.userData?.userId"
         class="relative cursor-pointer hover:bg-orange-50 rounded-full"
         @click="router.push('/cart')"
       >
-        <ShoppingCartIcon class="w-12 p-2" />
+        <ShoppingCartIcon class="w-8 md:w-12 p-1.5 md:p-2" />
         <span
           v-if="cartStore.cart"
-          class="absolute py-1 px-2 text-xs bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"
+          class="absolute py-0.5 md:py-1 px-1.5 md:px-2 text-xs bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"
         >
           {{ cartStore.cart }}
         </span>
       </div>
       <button class="rounded-full" @click="openSidebar()">
-        <Bars3Icon class="w-8" />
+        <Bars3Icon class="w-6 md:w-8" />
       </button>
     </div>
 
@@ -93,10 +93,10 @@ onMounted(() => {
         class="relative cursor-pointer hover:bg-orange-50 rounded-full"
         @click="router.push('/cart')"
       >
-        <ShoppingCartIcon class="w-12 p-2" />
+        <ShoppingCartIcon class="w-8 md:w-12 p-1.5 md:p-2" />
         <span
           v-if="cartStore.cart"
-          class="absolute py-1 px-2 text-xs bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"
+          class="absolute py-0.5 md:py-1 px-1 md:px-2 text-xs md:text-xs bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"
         >
           {{ cartStore.cart }}
         </span>

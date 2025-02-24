@@ -114,21 +114,24 @@ onMounted(() => {
     <div v-if="isLoading" class="no-data"><ArrowPathIcon class="no-data-icon" /> Loading...</div>
     <div v-else-if="cart?.length == 0" class="no-data">
       <NoSymbolIcon class="no-data-icon" /> No Item Available In Cart
-      <RouterLink to="/restaurant" class="route-link ml-2"> Add items</RouterLink>
+      <RouterLink to="/restaurant" class="route-link ml-1 md:ml-2"> Add items</RouterLink>
     </div>
     <div v-else class="h-5/6 overflow-y-auto">
       <table class="m-auto rounded-xl" style="background: rgb(255, 255, 255, 0.8)">
-        <tr class="text-xl font-bold border-b-2 border-gray-600">
-          <td>Item</td>
-          <td>Price</td>
-          <td>Quantity</td>
-          <td>Total</td>
+        <tr class="text-sm sm:text-base md:text-lg lg:text-xl font-bold border-b-2 border-gray-600">
+          <td class="table-pad">Item</td>
+          <td class="table-pad">Price</td>
+          <td class="table-pad">Quantity</td>
+          <td class="table-pad">Total</td>
         </tr>
         <tr v-for="i in [...cart]" :key="i">
-          <td class="flex space-x-3 items-center">
-            <div class="h-24 w-24">
+          <td class="table-pad flex space-x-1 sm:space-x-2 md:space-x-3 items-center">
+            <div class="h-10 w-10 sm:h-16 sm:w-16 md:h-24 md:w-24">
               <img
-                v-if="i.menuId?.image || i.itemId.image"
+                v-if="
+                  (i.menuId?.image && i.menuId.image != 'null' && i.menuId.image != 'undefined') ||
+                  (i.itemId?.image && i.itemId.image != 'null' && i.itemId.image != 'undefined')
+                "
                 :src="i.menuId?.image || i.itemId.image"
                 alt="Item Image"
                 class="uploaded-image"
@@ -141,14 +144,20 @@ onMounted(() => {
               />
             </div>
             <div>
-              <h3 class="text-xl font-semibold">{{ i.menuId?.name || i.itemId?.title }}</h3>
-              <p class="text-sm font-semibold text-green-600">
+              <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-semibold">
+                {{ i.menuId?.name || i.itemId?.title }}
+              </h3>
+              <p class="quantity-cls font-semibold">
                 Quantity : {{ i.menuId?.subCategories?.length || i.itemId?.quantity }}
               </p>
             </div>
           </td>
-          <td class="text-gray-700 text-lg font-bold no-wrap">₹ {{ i.price }} /-</td>
-          <td>
+          <td
+            class="table-pad text-gray-700 text-xs sm:text-sm md:text-base lg:text-lg font-bold no-wrap"
+          >
+            ₹ {{ i.price }} /-
+          </td>
+          <td class="table-pad">
             <AddToCart
               :value="i.quantity"
               :isLoading="i.isCartLoading"
@@ -156,11 +165,11 @@ onMounted(() => {
               @addItem="i.menuId ? addMenuToCart(i) : addItemToCart(i)"
             />
           </td>
-          <td class="price">₹ {{ i.price * i.quantity }} /-</td>
+          <td class="table-pad price">₹ {{ i.price * i.quantity }} /-</td>
         </tr>
-        <tr class="text-xl font-bold border-t-2 border-gray-600">
-          <td colspan="3" class="text-end">Total Amount</td>
-          <td class="price">₹ {{ totalAmount }} /-</td>
+        <tr class="text-sm sm:text-base md:text-lg lg:text-xl font-bold border-t-2 border-gray-600">
+          <td colspan="3" class="table-pad text-end">Total Amount</td>
+          <td class="table-pad price">₹ {{ totalAmount }} /-</td>
         </tr>
       </table>
     </div>
@@ -172,7 +181,7 @@ section {
   background-image: url('@/assets/img/cart-bg.jpg');
 }
 
-table td {
+/* table td {
   padding: 15px 30px;
-}
+} */
 </style>

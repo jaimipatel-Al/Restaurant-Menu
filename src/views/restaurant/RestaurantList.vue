@@ -9,15 +9,24 @@ const router = useRouter()
 
 const isLoading = ref(false)
 const restaurants = ref([])
+const scrollComponent = ref()
+const page = ref(0)
+const totalRestaurants = ref()
 
 const getRestaurant = async () => {
+  if (restaurants.value?.length == totalRestaurants.value) return
+
+  page.value++
   isLoading.value = true
 
-  await Axios.get(api.restaurantList)
+  await Axios.get(`${api.restaurantList}?page=${page.value}&limit=8`)
     .then(({ data }) => {
-      restaurants.value = data?.data?.map((e) => {
+      const res = data.data
+      totalRestaurants.value = res?.totalOwners
+      const arr = res?.users?.map((e) => {
         return { ...e, isDeleting: false }
       })
+      restaurants.value = [...restaurants.value, ...arr]
     })
     .catch((er) => {
       console.error(er?.response?.data?.message)
@@ -27,8 +36,15 @@ const getRestaurant = async () => {
     })
 }
 
+const handleScroll = () => {
+  const el = scrollComponent.value
+  if (!el) return
+  if (el.scrollHeight - el.scrollTop <= el.clientHeight + 50 && !isLoading.value) getRestaurant()
+}
+
 onMounted(() => {
   getRestaurant()
+  scrollComponent.value.addEventListener('scroll', handleScroll)
 })
 </script>
 
@@ -37,18 +53,22 @@ onMounted(() => {
     <div class="px-8 py-5">
       <h1 class="main-title">Restaurants</h1>
     </div>
-    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="no-data-icon" /> Loading...</div>
-    <div v-else-if="restaurants?.length == 0" class="no-data">
-      <NoSymbolIcon class="no-data-icon" /> No Restaurants Available
-    </div>
-    <div v-else class="h-5/6 overflow-y-auto flex justify-evenly items-start flex-wrap">
+    <div
+      ref="scrollComponent"
+      class="h-5/6 overflow-y-auto flex justify-evenly items-start flex-wrap"
+    >
+      <div v-if="restaurants?.length == 0 && !isLoading" class="no-data">
+        <NoSymbolIcon class="no-data-icon" /> No Restaurants Available
+      </div>
       <div
+        v-else
         v-for="(r, i) in restaurants"
         :key="r._id"
         class="h-auto m-1 sm:m-2 p-2 sm:p-3 cursor-pointer bg-white shadow-2xl"
         @click="router.push(`/restaurant/${r._id}`)"
       >
         <div>
+          <!-- v-if="m.image && m.image != 'null' && m.image!='undefined'" -->
           <img
             v-if="i % 10 == 0"
             src="@/assets/img/restaurant/r-0.jpg"
@@ -114,6 +134,7 @@ onMounted(() => {
           {{ r.name }}
         </h2>
       </div>
+      <div v-if="isLoading" class="no-data"><ArrowPathIcon class="no-data-icon" /> Loading...</div>
     </div>
   </section>
 </template>

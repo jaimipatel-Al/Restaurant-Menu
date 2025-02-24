@@ -59,13 +59,10 @@ const getCategoryDetail = async () => {
 const addCategory = async () => {
   isLoading.value = true
 
-  let formData
-  if (file.value) {
-    formData = new FormData()
-    formData.append('title', title.value)
-    formData.append('description', description.value)
-    formData.append('image', image.value)
-  } else formData = { title: title.value, description: description.value }
+  let formData = new FormData()
+  formData.append('title', title.value)
+  formData.append('description', description.value)
+  if (image.value) formData.append('image', image.value)
 
   await Axios.post(api.createCategory, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -84,13 +81,10 @@ const addCategory = async () => {
 const editCategory = async () => {
   isLoading.value = true
 
-  let formData
-  if (file.value) {
-    formData = new FormData()
-    formData.append('title', title.value)
-    formData.append('description', description.value)
-    formData.append('image', image.value)
-  } else formData = { title: title.value, description: description.value }
+  let formData = new FormData()
+  formData.append('title', title.value)
+  formData.append('description', description.value)
+  if (image.value || (!imageUrl.value && !image.value)) formData.append('image', image.value)
 
   await Axios.put(`${api.updateCategory}${id.value}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
@@ -119,7 +113,7 @@ watch(
 <template>
   <section class="bg-screen flex items-center justify-end add-edit-form">
     <div
-      class="sm:w-1/3 shadow-2xl m-16 p-8"
+      class="w-full sm:w-2/3 md:w-1/3 shadow-2xl m-5 sm:m-10 md:m-16 p-4 sm:p-6 md:p-8"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
       <h1 class="main-title">{{ id ? 'Update ' : 'Add ' }} Category</h1>
@@ -162,13 +156,12 @@ watch(
           <ArrowUpTrayIcon class="upload-button mx-2" v-if="!imageUrl" @click="file.click()" />
           <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
         </label>
-        <div v-if="imageUrl && !isGetting" class="relative mt-4 w-24 h-24">
+        <div
+          v-if="imageUrl && !isGetting"
+          class="relative mt-2 sm:mt-2 md:mt-4 w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24"
+        >
           <XMarkIcon class="remove-image" @click="removeImage()" />
-          <img
-            :src="imageUrl"
-            alt="Uploaded Image"
-            class="full-image rounded-lg border border-gray-300"
-          />
+          <img :src="imageUrl" alt="Uploaded Image" class="uploaded-img-box" />
         </div>
 
         <button type="submit" :disabled="isLoading || isGetting">
