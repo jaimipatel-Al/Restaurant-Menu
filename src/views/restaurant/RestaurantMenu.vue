@@ -1,11 +1,13 @@
 <script setup>
-import { ArrowPathIcon, NoSymbolIcon, PlusIcon, MinusIcon } from '@heroicons/vue/24/solid'
+import { ArrowPathIcon, NoSymbolIcon } from '@heroicons/vue/24/solid'
 import { computed, onMounted, ref } from 'vue'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { useRoute } from 'vue-router'
 import toast from '@/plugin/toast'
 import { useCartStore } from '@/stores/cartStore'
+import AddToCart from '@/components/elements/AddToCart.vue'
+import ComboItems from '@/components/elements/ComboItems.vue'
 
 const route = useRoute()
 const cartStore = useCartStore()
@@ -141,18 +143,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="bg-screen">
+  <section>
+    <div class="px-8 py-5 text-center">
+      <h1 class="main-title">Restaurant Menu</h1>
+    </div>
     <div v-if="isMenuLoading || isItemLoading" class="no-data">
-      <ArrowPathIcon class="w-12 mx-3" /> Loading...
+      <ArrowPathIcon class="no-data-icon" /> Loading...
     </div>
     <div v-else-if="menus?.length == 0 && items?.length == 0" class="no-data">
-      <NoSymbolIcon class="w-12 mx-3" /> No Restaurants Available
+      <NoSymbolIcon class="no-data-icon" /> No Menu Available For This Restaurants
     </div>
     <div v-else>
       <div v-if="todaySpecial">
-        <h2 class="auth-title shadow-2xl text-center p-10 my-10 bg-white">
-          Today's Special Food Combos
-        </h2>
+        <h2 class="main-heading">Today's Special Food Combos</h2>
         <div class="p-10 my-10 w-full flex-between flex-col md:flex-row cursor-pointer space-x-10">
           <div class="h-96 w-1/3">
             <img
@@ -171,12 +174,10 @@ onMounted(() => {
           <div class="w-2/3">
             <div class="p-3 font-bold text-xl flex-between">
               <div>
-                <h3 class="text-3xl">
+                <h3 class="sub-heading">
                   {{ todaySpecial.name }}
                 </h3>
-                <p class="text-blue-700 text-lg" style="text-wrap: nowrap">
-                  ₹ {{ todaySpecial.price }} /-
-                </p>
+                <p class="price">₹ {{ todaySpecial.price }} /-</p>
                 <p class="text-sm text-green-700">
                   Quantity : {{ todaySpecial.subCategories?.length }}
                 </p>
@@ -185,63 +186,28 @@ onMounted(() => {
                 <button
                   :disabled="todaySpecial.isCartLoading"
                   v-if="!cart.find((e) => e.menuId?._id == todaySpecial._id)"
-                  class="button text-lg flex py-1.5 block px-5"
+                  class="add-btn"
                   @click="addMenuToCart(todaySpecial, true)"
                 >
                   <ArrowPathIcon v-if="todaySpecial.isCartLoading" class="w-6 mr-1" /> Add To Cart
                 </button>
-                <div v-else class="flex items-center space-x-3">
-                  <button
-                    :disabled="todaySpecial.isCartLoading"
-                    class="button p-2"
-                    @click="removeMenuFromCart(todaySpecial, true)"
-                  >
-                    <MinusIcon class="w-6" />
-                  </button>
-                  <ArrowPathIcon v-if="todaySpecial.isCartLoading" class="w-6 text-orange-700" />
-                  <span v-else class="font-semibold text-lg p-1.5">
-                    {{ cart.find((e) => e.menuId?._id == todaySpecial._id)?.quantity ?? 0 }}
-                  </span>
-                  <button
-                    :disabled="todaySpecial.isCartLoading"
-                    class="button p-2"
-                    @click="addMenuToCart(todaySpecial, true)"
-                  >
-                    <PlusIcon class="w-6" />
-                  </button>
-                </div>
+                <AddToCart
+                  v-else
+                  :value="cart.find((e) => e.menuId?._id == todaySpecial._id)?.quantity ?? 0"
+                  :isLoading="todaySpecial.isCartLoading"
+                  @removeItem="removeMenuFromCart(todaySpecial, true)"
+                  @addItem="addMenuToCart(todaySpecial, true)"
+                />
               </div>
             </div>
             <div class="flex justify-start overflow-x-auto w-full">
-              <div
-                v-for="i in todaySpecial.subCategories"
-                :key="i"
-                class="p-2 shadow-2xl rounded-xl w-48 flex-none m-2 cursor-pointer"
-                style="background: rgb(255, 255, 255, 0.8)"
-                @click="addItem(i)"
-              >
-                <div class="h-36">
-                  <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
-                  <img
-                    v-else
-                    src="@/assets/img/default-item.jpg"
-                    alt="Item Image"
-                    class="uploaded-image"
-                  />
-                </div>
-                <div class="p-1 font-bold flex-between">
-                  <p class="text-orange-600 text-lg">{{ i.title }}</p>
-                  <p class="text-blue-700 text-sm" style="text-wrap: nowrap">₹ {{ i.price }} /-</p>
-                </div>
-              </div>
+              <ComboItems v-for="i in todaySpecial.subCategories" :key="i" :item="i" />
             </div>
           </div>
         </div>
       </div>
-      <h2 v-if="menus?.length" class="auth-title shadow-2xl text-center p-10 my-10 bg-white">
-        Food Combos
-      </h2>
-      <div class="flex items-start justify-start overflow-x-auto w-full p-5 pb-0">
+      <h2 v-if="menus?.length" class="main-heading">Food Combos</h2>
+      <div class="flex items-start justify-start overflow-x-auto w-full p-5">
         <div
           v-for="m in menus"
           :key="m"
@@ -258,40 +224,31 @@ onMounted(() => {
             />
           </div>
           <div class="p-3">
-            <h3 class="text-xl font-bold flex justify-between">
+            <h3 class="sub-title flex justify-between">
               {{ m.name }}
-              <span class="text-blue-700 text-lg" style="text-wrap: nowrap"
-                >₹ {{ m.price }} /-</span
-              >
+              <span class="price">₹ {{ m.price }} /-</span>
             </h3>
-            <span class="text-sm text-green-700">Quantity : {{ m.subCategories?.length }}</span>
+            <p class="text-sm text-green-700 mb-2">Quantity : {{ m.subCategories?.length }}</p>
 
             <button
               :disabled="m.isCartLoading"
               v-if="!cart.find((e) => e.menuId?._id == m._id)"
-              class="button text-lg flex mt-2 py-1.5 block px-5"
+              class="add-btn"
               @click="addMenuToCart(m)"
             >
               <ArrowPathIcon v-if="m.isCartLoading" class="w-6 mr-1" /> Add To Cart
             </button>
-            <div v-else class="flex items-center space-x-3">
-              <button :disabled="m.isCartLoading" class="button p-2" @click="removeMenuFromCart(m)">
-                <MinusIcon class="w-6" />
-              </button>
-              <ArrowPathIcon v-if="m.isCartLoading" class="w-6 text-orange-700" />
-              <span v-else class="font-semibold text-lg p-1.5">
-                {{ cart.find((e) => e.menuId?._id == m._id)?.quantity ?? 0 }}
-              </span>
-              <button :disabled="m.isCartLoading" class="button p-2" @click="addMenuToCart(m)">
-                <PlusIcon class="w-6" />
-              </button>
-            </div>
+            <AddToCart
+              v-else
+              :value="cart.find((e) => e.menuId?._id == m._id)?.quantity ?? 0"
+              :isLoading="m.isCartLoading"
+              @removeItem="removeMenuFromCart(m)"
+              @addItem="addMenuToCart(m)"
+            />
           </div>
         </div>
       </div>
-      <h2 v-if="items?.length" class="auth-title shadow-2xl text-center p-10 my-10 bg-white">
-        Food Items
-      </h2>
+      <h2 v-if="items?.length" class="main-heading">Food Items</h2>
       <div class="h-5/6 overflow-y-auto flex justify-evenly items-start flex-wrap my-10">
         <div class="flex items-center justify-evenly flex-wrap">
           <div
@@ -312,11 +269,9 @@ onMounted(() => {
             <div class="p-3">
               <h3 class="text-xl font-bold flex justify-between">
                 {{ i.title }}
-                <span class="text-blue-700 text-lg" style="text-wrap: nowrap"
-                  >₹ {{ i.price }} /-</span
-                >
+                <span class="price">₹ {{ i.price }} /-</span>
               </h3>
-              <p class="flex justify-between">
+              <p class="flex justify-between mb-2">
                 <span class="text-sm text-green-700">Quantity : {{ i.quantity }}</span>
                 <span class="text-sm text-orange-700">{{ i.categoryId?.title }}</span>
               </p>
@@ -324,27 +279,18 @@ onMounted(() => {
               <button
                 :disabled="i.isCartLoading"
                 v-if="!cart.find((e) => e?.itemId?._id == i._id)"
-                class="button text-lg flex mt-2 py-1.5 block px-5"
+                class="add-btn"
                 @click="addItemToCart(i)"
               >
                 <ArrowPathIcon v-if="i.isCartLoading" class="w-6 mr-1" /> Add To Cart
               </button>
-              <div v-else class="flex items-center space-x-3">
-                <button
-                  :disabled="i.isCartLoading"
-                  class="button p-2"
-                  @click="removeItemFromCart(i)"
-                >
-                  <MinusIcon class="w-6" />
-                </button>
-                <ArrowPathIcon v-if="i.isCartLoading" class="w-6 text-orange-700" />
-                <span v-else class="font-semibold text-lg p-1.5">
-                  {{ cart.find((e) => e.itemId?._id == i._id)?.quantity ?? 0 }}
-                </span>
-                <button :disabled="i.isCartLoading" class="button p-2" @click="addItemToCart(i)">
-                  <PlusIcon class="w-6" />
-                </button>
-              </div>
+              <AddToCart
+                v-else
+                :value="cart.find((e) => e.itemId?._id == i._id)?.quantity ?? 0"
+                :isLoading="i.isCartLoading"
+                @removeItem="removeItemFromCart(i)"
+                @addItem="addItemToCart(i)"
+              />
             </div>
           </div>
         </div>
@@ -355,6 +301,7 @@ onMounted(() => {
 
 <style scoped>
 section {
-  /* background-image: url('@/assets/img/restaurant-menu.jpg'); */
+  background-image: url('@/assets/img/restaurant-menu.jpg');
+  min-height: 100vh;
 }
 </style>

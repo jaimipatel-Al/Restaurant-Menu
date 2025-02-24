@@ -7,6 +7,7 @@ import * as yup from 'yup'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import toast from '@/plugin/toast'
+import ComboItems from '@/components/elements/ComboItems.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -183,11 +184,11 @@ onMounted(() => {
 <template>
   <section class="bg-screen flex items-center justify-end add-edit-form">
     <div
-      class="w-full h-5/6 shadow-2xl mx-10 py-5 px-10 flex"
+      class="w-full h-5/6 shadow-2xl mx-10 py-3 sm:py-4 md:py-5 px-4 sm:px-8 md:px-10 flex"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
       <div class="w-96 flex-none">
-        <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Combo</h1>
+        <h1 class="main-title">{{ id ? 'Update ' : 'Add ' }} Combo</h1>
         <p class="auth-detail">
           Make Combo, A perfect mix of tasty snacks and hearty meals.
           <RouterLink to="/combo" class="route-link">Back to Combo list</RouterLink>
@@ -235,7 +236,11 @@ onMounted(() => {
             />
             Is Add on Today's Special Combo?
           </label>
-          <label v-if="!isGetting && id" for="active" class="flex items-center space-x-3 mb-5">
+          <label
+            v-if="!isGetting && id"
+            for="active"
+            class="flex items-center text-sm sm:text-base space-x-3 mb-5"
+          >
             <input v-model="isActive" type="checkbox" id="active" class="w-4 h-4 cursor-pointer" />
             Available
           </label>
@@ -255,42 +260,28 @@ onMounted(() => {
           </div>
 
           <button type="submit" :disabled="isLoading || isGetting || items?.length == 0">
-            {{ id ? 'Edit ' : 'Add ' }} Combo <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
+            {{ id ? 'Edit ' : 'Add ' }} Combo
+            <ArrowPathIcon v-if="isLoading" class="loading-btn" />
           </button>
         </Form>
       </div>
       <div class="ml-3 w-full">
         <div v-if="isItemLoading || isGetting" class="no-data">
-          <ArrowPathIcon class="w-6 mx-3" /> Loading...
+          <ArrowPathIcon class="loading-btn" /> Loading...
         </div>
         <div v-else-if="items?.length == 0" class="no-data">
-          <NoSymbolIcon class="w-12 mx-3" /> No Item Available
+          <NoSymbolIcon class="no-data-icon" /> No Item Available
           <RouterLink to="/item/add-item" class="route-link ml-2"> Add items</RouterLink>
         </div>
         <div v-else class="flex flex-wrap items-start justify-start overflow-y-auto h-full">
-          <div
+          <ComboItems
             v-for="i in items"
             :key="i"
-            class="p-2 shadow-2xl rounded-xl w-56 m-2 cursor-pointer"
-            style="background: rgb(255, 255, 255, 0.8)"
+            :item="i"
+            @addItem="addItem(i)"
+            :isRemove="selectedItem.find((e) => e?._id == i?._id)"
             :class="{ 'active-item relative': selectedItem.find((e) => e?._id == i?._id) }"
-            @click="addItem(i)"
-          >
-            <XMarkIcon v-if="selectedItem.find((e) => e?._id == i?._id)" class="remove-image" />
-            <div class="h-40">
-              <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
-              <img
-                v-else
-                src="@/assets/img/default-item.jpg"
-                alt="Item Image"
-                class="uploaded-image"
-              />
-            </div>
-            <div class="p-2 font-bold">
-              <p class="text-orange-600 text-lg">{{ i.title }}</p>
-              <p class="text-blue-700 text-sm">₹ {{ i.price }} /-</p>
-            </div>
-          </div>
+          />
         </div>
       </div>
     </div>

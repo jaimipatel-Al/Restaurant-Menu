@@ -74,7 +74,7 @@ onMounted(() => {
   <main class="auth flex items-center">
     <div class="auth-box" style="height: 600px">
       <div class="flex-1 p-10">
-        <h1 class="auth-title">Login</h1>
+        <h1 class="main-title">Login</h1>
         <p class="auth-detail">
           Doesn't have an account yet?
           <RouterLink to="/signup" class="route-link">Sign Up</RouterLink>
@@ -122,7 +122,7 @@ onMounted(() => {
             class="button flex items-center justify-center w-full mt-10"
             :disabled="isLogin"
           >
-            Login <ArrowPathIcon v-if="isLogin" class="w-6 mx-3" />
+            Login <ArrowPathIcon v-if="isLogin" class="loading-btn" />
           </button>
         </Form>
       </div>

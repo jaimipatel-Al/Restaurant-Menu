@@ -1,5 +1,5 @@
 <script setup>
-import { ShoppingCartIcon } from '@heroicons/vue/24/solid'
+import { ShoppingCartIcon, Bars3Icon } from '@heroicons/vue/24/solid'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useCartStore } from '@/stores/cartStore'
@@ -16,6 +16,18 @@ const logout = () => {
   router.push('/login')
 }
 
+const openSidebar = () => {
+  document.getElementById('sidebar').classList.add('open')
+  document.getElementById('overlay').classList.add('active')
+}
+
+const closeSidebar = () => {
+  setTimeout(() => {
+    document.getElementById('sidebar').classList.remove('open')
+    document.getElementById('overlay').classList.remove('active')
+  }, 200)
+}
+
 onMounted(() => {
   cartStore.getCartValue()
 })
@@ -23,13 +35,36 @@ onMounted(() => {
 
 <template>
   <header class="flex-between">
+    <div class="block sm:hidden overlay" id="overlay" @click="closeSidebar()"></div>
     <div class="flex items-center space-x-2 m-2 cursor-pointer" @click="router.push('/')">
-      <img src="@/assets/img/favicon.png" alt="Logo" class="w-20" />
-      <h1 class="text-5xl italic font-bold py-5 text-gray-600">
+      <img src="@/assets/img/favicon.png" alt="Logo" class="w-12 md:w-16 lg:w-20" />
+      <h1
+        class="text-2xl md:text-4xl lg:text-5xl italic font-bold py-1 md:py-3 lg:py-5 text-gray-600"
+      >
         Food <span class="text-orange-600">Partner</span>
       </h1>
     </div>
-    <nav class="flex justify-end items-center text-xl font-semibold space-x-5 mx-10">
+
+    <div class="block sm:hidden flex items-center space-x-5 mr-5">
+      <div
+        v-if="authStore?.userData?.userId"
+        class="relative cursor-pointer hover:bg-orange-50 rounded-full"
+        @click="router.push('/cart')"
+      >
+        <ShoppingCartIcon class="w-12 p-2" />
+        <span
+          v-if="cartStore.cart"
+          class="absolute py-1 px-2 text-xs bg-orange-500 hover:bg-orange-600 rounded-full -top-2 -right-2 text-white"
+        >
+          {{ cartStore.cart }}
+        </span>
+      </div>
+      <button class="rounded-full" @click="openSidebar()">
+        <Bars3Icon class="w-8" />
+      </button>
+    </div>
+
+    <nav class="navigation-menu">
       <RouterLink to="/" class="router-link">Home</RouterLink>
       <RouterLink v-if="authStore?.userData?.userId" to="/restaurant" class="router-link"
         >Restaurant</RouterLink
@@ -68,5 +103,62 @@ onMounted(() => {
       </div>
       <RouterLink v-else to="/signup" class="router-link">Sign Up</RouterLink>
     </nav>
+
+    <nav class="sidebar pt-3 shadow-xl" id="sidebar" @click="closeSidebar()">
+      <RouterLink to="/" class="router-link">Home</RouterLink>
+      <RouterLink v-if="authStore?.userData?.userId" to="/restaurant" class="router-link"
+        >Restaurant</RouterLink
+      >
+      <RouterLink
+        v-if="authStore?.userData?.userId && authStore?.userData?.role == 'owner'"
+        to="/combo"
+        class="router-link"
+        >Combo</RouterLink
+      >
+      <RouterLink
+        v-if="authStore?.userData?.userId && authStore?.userData?.role == 'owner'"
+        to="/item"
+        class="router-link"
+        >Item</RouterLink
+      >
+      <RouterLink
+        v-if="authStore?.userData?.userId && authStore?.userData?.role == 'owner'"
+        to="/category"
+        class="router-link"
+        >Category</RouterLink
+      >
+      <a v-if="authStore?.userData?.userId" class="router-link" @click="logout()">Logout</a>
+      <RouterLink v-else to="/signup" class="router-link">Sign Up</RouterLink>
+    </nav>
   </header>
 </template>
+
+<style  scoped>
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -200px;
+  width: 200px;
+  height: 100%;
+  background: #888888;
+  transition: 0.3s;
+}
+
+.sidebar.open {
+  right: 0;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+.overlay.active {
+  display: block;
+}
+</style>

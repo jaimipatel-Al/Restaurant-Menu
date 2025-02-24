@@ -196,7 +196,7 @@ onMounted(() => getCategories())
 <template>
   <section class="bg-screen add-edit-form">
     <div class="md:w-5/6 shadow-2xl my-8 p-8 mx-auto" style="background: rgb(250, 200, 200, 0.25)">
-      <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Item</h1>
+      <h1 class="main-title">{{ id ? 'Update ' : 'Add ' }} Item</h1>
       <p class="auth-detail">
         {{
           id
@@ -252,7 +252,8 @@ onMounted(() => getCategories())
           </div>
 
           <button type="submit" :disabled="isLoading">
-            {{ id ? 'Edit ' : 'Add ' }} Item <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
+            {{ id ? 'Edit ' : 'Add ' }} Item
+            <ArrowPathIcon v-if="isLoading" class="loading-btn" />
           </button>
         </div>
         <div class="flex-1">
@@ -291,7 +292,11 @@ onMounted(() => getCategories())
           />
           <p v-if="!isGetting" class="error-message">{{ errors?.Quantity }}</p>
 
-          <label v-if="id && !isGetting" for="available" class="flex items-center font-semibold">
+          <label
+            v-if="id && !isGetting"
+            for="available"
+            class="flex items-center font-semibold text-sm sm:text-base"
+          >
             <input
               v-model="isActive"
               type="checkbox"

@@ -1,17 +1,12 @@
 <script setup>
-import {
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
-  ArrowPathIcon,
-  NoSymbolIcon,
-} from '@heroicons/vue/24/solid'
+import { PlusIcon, ArrowPathIcon, NoSymbolIcon } from '@heroicons/vue/24/solid'
 import { onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { useAuthStore } from '@/stores/authStore'
 import toast from '@/plugin/toast'
+import AddEditIcon from '@/components/elements/AddEditIcon.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -58,37 +53,33 @@ onMounted(() => {
 
 <template>
   <section class="bg-screen">
-    <div class="flex-between px-8 py-5">
-      <h1 class="auth-title">Category</h1>
+    <div class="main-header-nav">
+      <h1 class="main-title">Category</h1>
       <RouterLink to="/category/add-category" class="add-btn"><PlusIcon /> Add Category</RouterLink>
     </div>
-    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-12 mx-3" /> Loading...</div>
+    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="no-data-icon" /> Loading...</div>
     <div v-else-if="categories?.length == 0" class="no-data">
-      <NoSymbolIcon class="w-12 mx-3" /> No Category Available
+      <NoSymbolIcon class="no-data-icon" /> No Category Available
     </div>
     <div v-else class="h-5/6 overflow-y-auto">
       <div
         v-for="c in categories"
         :key="c._id"
-        class="md:w-5/6 h-64 mx-auto p-3 my-8 shadow-2xl rounded-xl flex space-x-5 flex-col sm:flex-row"
+        class="md:w-5/6 h-auto md:h-58 mx-8 md:mx-auto p-3 my-8 shadow-2xl rounded-xl flex sm:space-x-5 flex-col sm:flex-row"
         style="background: rgb(255, 255, 255, 0.8)"
       >
-        <div class="w-full sm:w-96 md:w-80 flex-none">
+        <div class="h-48 md:h-58 w-full sm:w-72 md:w-64 flex-none">
           <img v-if="c.image" :src="c.image" alt="Category Image" class="full-image" />
           <img v-else src="@/assets/img/default-category.png" alt="Category Image" />
         </div>
         <div class="flex-auto p-2">
-          <div class="flex items-start justify-between">
-            <h3 class="text-orange-700 text-2xl font-semibold">{{ c.title }}</h3>
-            <div class="flex" v-if="c.createdBy == authStore.userData.userId">
-              <PencilIcon
-                class="button-edit"
-                @click="router.push(`/category/edit-category/${c._id}`)"
-              />
-              <TrashIcon v-if="!c.isDeleting" class="button-delete" @click="deleteCategory(c)" />
-              <ArrowPathIcon v-else class="button-delete" />
-            </div>
-          </div>
+          <AddEditIcon
+            :title="c.title"
+            :isShow="c.createdBy == authStore.userData.userId"
+            @editItem="router.push(`/category/edit-category/${c._id}`)"
+            @deleteItem="deleteCategory(c)"
+            :isDeleting="c.isDeleting"
+          />
           <RouterLink :to="`/item`" class="text-orange-400 text-sm">Show Items</RouterLink>
           <p class="auth-detail">{{ c.description }}</p>
         </div>

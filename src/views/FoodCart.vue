@@ -1,16 +1,11 @@
 <script setup>
-import {
-  ArrowPathIcon,
-  NoSymbolIcon,
-  PlusIcon,
-  MinusIcon,
-  TrashIcon,
-} from '@heroicons/vue/24/solid'
+import { ArrowPathIcon, NoSymbolIcon, TrashIcon } from '@heroicons/vue/24/solid'
 import { onMounted, ref } from 'vue'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { useCartStore } from '@/stores/cartStore'
 import toast from '@/plugin/toast'
+import AddToCart from '@/components/elements/AddToCart.vue'
 
 const cart = ref([])
 const isLoading = ref(false)
@@ -110,13 +105,15 @@ onMounted(() => {
 
 <template>
   <section class="bg-screen">
-    <div class="flex-between px-8 py-5">
-      <h1 class="auth-title">Cart</h1>
-      <button class="add-btn" @click="removeAll()"><TrashIcon /> Remove All From Cart</button>
+    <div class="main-header-nav">
+      <h1 class="main-title">Cart</h1>
+      <button v-if="!isLoading && cart?.length" class="add-btn" @click="removeAll()">
+        <TrashIcon /> Remove All From Cart
+      </button>
     </div>
-    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-12 mx-3" /> Loading...</div>
+    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="no-data-icon" /> Loading...</div>
     <div v-else-if="cart?.length == 0" class="no-data">
-      <NoSymbolIcon class="w-12 mx-3" /> No Item Available In Cart
+      <NoSymbolIcon class="no-data-icon" /> No Item Available In Cart
       <RouterLink to="/restaurant" class="route-link ml-2"> Add items</RouterLink>
     </div>
     <div v-else class="h-5/6 overflow-y-auto">
@@ -150,38 +147,20 @@ onMounted(() => {
               </p>
             </div>
           </td>
-          <td class="text-gray-700 text-lg font-bold" style="text-wrap: nowrap">
-            ₹ {{ i.price }} /-
-          </td>
+          <td class="text-gray-700 text-lg font-bold no-wrap">₹ {{ i.price }} /-</td>
           <td>
-            <div class="flex items-center space-x-3">
-              <button
-                :disabled="i.isCartLoading"
-                class="button p-2"
-                @click="i.menuId ? removeMenuFromCart(i) : removeItemFromCart(i)"
-              >
-                <MinusIcon class="w-6" />
-              </button>
-              <ArrowPathIcon v-if="i.isCartLoading" class="w-6 text-orange-600" />
-              <span v-else class="font-semibold text-lg p-1.5">
-                {{ i.quantity }}
-              </span>
-              <button
-                :disabled="i.isCartLoading"
-                class="button p-2"
-                @click="i.menuId ? addMenuToCart(i) : addItemToCart(i)"
-              >
-                <PlusIcon class="w-6" />
-              </button>
-            </div>
+            <AddToCart
+              :value="i.quantity"
+              :isLoading="i.isCartLoading"
+              @removeItem="i.menuId ? removeMenuFromCart(i) : removeItemFromCart(i)"
+              @addItem="i.menuId ? addMenuToCart(i) : addItemToCart(i)"
+            />
           </td>
-          <td class="text-blue-600 text-lg font-bold" style="text-wrap: nowrap">
-            ₹ {{ i.price * i.quantity }} /-
-          </td>
+          <td class="price">₹ {{ i.price * i.quantity }} /-</td>
         </tr>
         <tr class="text-xl font-bold border-t-2 border-gray-600">
           <td colspan="3" class="text-end">Total Amount</td>
-          <td class="text-blue-600" style="text-wrap: nowrap">₹ {{ totalAmount }} /-</td>
+          <td class="price">₹ {{ totalAmount }} /-</td>
         </tr>
       </table>
     </div>

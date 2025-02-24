@@ -74,8 +74,8 @@ const signup = async () => {
       <div class="auth-img-box">
         <img src="@/assets/img/signup.jpg" alt="Sign Up" class="full-image" />
       </div>
-      <div class="flex-1 p-10">
-        <h1 class="auth-title">Sign Up</h1>
+      <div class="flex-1 pa-10">
+        <h1 class="main-title">Sign Up</h1>
         <p class="auth-detail">
           Already have an account?
           <RouterLink to="/login" class="route-link">Login</RouterLink>
@@ -147,7 +147,7 @@ const signup = async () => {
             class="button flex items-center justify-center w-full mt-8"
             :disabled="isSignup"
           >
-            Sign Up <ArrowPathIcon v-if="isSignup" class="w-6 mx-3" />
+            Sign Up <ArrowPathIcon v-if="isSignup" class="loading-btn" />
           </button>
         </Form>
       </div>

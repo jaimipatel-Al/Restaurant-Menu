@@ -122,7 +122,7 @@ watch(
       class="sm:w-1/3 shadow-2xl m-16 p-8"
       style="background: rgb(250, 200, 200, 0.25); min-width: 300px"
     >
-      <h1 class="auth-title">{{ id ? 'Update ' : 'Add ' }} Category</h1>
+      <h1 class="main-title">{{ id ? 'Update ' : 'Add ' }} Category</h1>
       <p class="auth-detail">
         Organize your menu effortlessly by {{ id ? 'updating  ' : 'adding  ' }} food categories!
         <RouterLink to="/category" class="route-link">Back to Category list</RouterLink>
@@ -172,7 +172,8 @@ watch(
         </div>
 
         <button type="submit" :disabled="isLoading || isGetting">
-          {{ id ? 'Edit ' : 'Add ' }} Category <ArrowPathIcon v-if="isLoading" class="w-6 mx-3" />
+          {{ id ? 'Edit ' : 'Add ' }} Category
+          <ArrowPathIcon v-if="isLoading" class="loading-btn" />
         </button>
       </Form>
     </div>

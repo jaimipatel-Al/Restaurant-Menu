@@ -1,17 +1,12 @@
 <script setup>
-import {
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
-  ArrowPathIcon,
-  NoSymbolIcon,
-} from '@heroicons/vue/24/solid'
+import { PlusIcon, ArrowPathIcon, NoSymbolIcon } from '@heroicons/vue/24/solid'
 import { onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import Axios from '@/plugin/axios'
 import api from '@/plugin/apis'
 import { useAuthStore } from '@/stores/authStore'
 import toast from '@/plugin/toast'
+import AddEditIcon from '@/components/elements/AddEditIcon.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -67,35 +62,37 @@ onMounted(() => {
 
 <template>
   <section class="bg-screen">
-    <div class="flex-between px-8 py-5">
-      <h1 class="auth-title">Items</h1>
+    <div class="main-header-nav">
+      <h1 class="main-title">Items</h1>
       <RouterLink to="/item/add-item" class="add-btn"><PlusIcon /> Add Item</RouterLink>
     </div>
-    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="w-6 mx-3" /> Loading...</div>
+    <div v-if="isLoading" class="no-data"><ArrowPathIcon class="loading-btn" /> Loading...</div>
     <div v-else-if="items?.length == 0" class="no-data">
-      <NoSymbolIcon class="w-12 mx-3" /> No Item Available
+      <NoSymbolIcon class="no-data-icon" /> No Item Available
     </div>
-    <div v-else class="h-5/6 overflow-y-auto flex justify-evenly px-10 flex-wrap">
+    <div v-else class="h-5/6 overflow-y-auto flex justify-evenly px-4 sm:px-8 md:px-10 flex-wrap">
       <div
         v-for="i in items"
         :key="i"
-        class="p-2 shadow-2xl rounded-xl w-80 my-5 mx-3"
+        class="p-2 shadow-2xl rounded-xl w-full sm:w-80 my-5 mx-3"
         style="background: rgb(255, 255, 255, 0.8)"
       >
         <div class="h-72">
           <img v-if="i.image" :src="i.image" alt="Item Image" class="uploaded-image" />
           <img v-else src="@/assets/img/default-item.jpg" alt="Item Image" class="uploaded-image" />
         </div>
-        <div class="flex-between px-2">
-          <h3 class="text-orange-700 text-2xl font-semibold">{{ i.title }}</h3>
-          <div class="flex items-start" v-if="i.createdBy == authStore.userData.userId">
-            <PencilIcon class="button-edit" @click="router.push(`/item/edit-item/${i._id}`)" />
-            <TrashIcon v-if="!i.isDeleting" class="button-delete" @click="deleteItem(i)" />
-            <ArrowPathIcon v-else class="button-delete" />
-          </div>
-        </div>
         <div class="p-2">
-          <label :for="`available-${i._id}`" class="flex items-center font-semibold">
+          <AddEditIcon
+            :title="i.title"
+            :isShow="i.createdBy == authStore.userData.userId"
+            @editItem="router.push(`/item/edit-item/${i._id}`)"
+            @deleteItem="deleteItem(i)"
+            :isDeleting="i.isDeleting"
+          />
+          <label
+            :for="`available-${i._id}`"
+            class="flex items-center text-sm sm:text-base font-semibold"
+          >
             <input
               v-model="i.isActive"
               type="checkbox"
@@ -109,7 +106,7 @@ onMounted(() => {
             <RouterLink to="/category" class="text-orange-400 text-sm">{{
               i.categoryId?.title
             }}</RouterLink>
-            <span class="text-blue-700">₹ {{ i.price }} /-</span>
+            <span class="price">₹ {{ i.price }} /-</span>
           </div>
           <p class="text-sm font-semibold text-gray-800">Quantity : {{ i.quantity }}</p>
           <p class="auth-detail">{{ i.description }}</p>
