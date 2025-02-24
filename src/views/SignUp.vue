@@ -1,5 +1,11 @@
 <script setup>
-import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from '@heroicons/vue/24/solid'
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  ArrowPathIcon,
+  ArrowUpTrayIcon,
+  XMarkIcon,
+} from '@heroicons/vue/24/solid'
 import { Form, Field } from 'vee-validate'
 import { ref } from 'vue'
 import * as yup from 'yup'
@@ -12,7 +18,7 @@ import { useRouter } from 'vue-router'
 const authStore = useAuthStore()
 const router = useRouter()
 const schema = yup.object({
-  Name: yup.string().required().max(20),
+  Name: yup.string().required().max(50),
   Email: yup.string().required().email(),
   Password: yup
     .string()
@@ -36,26 +42,31 @@ const isPassword = ref(false)
 const isConfirmPassword = ref(false)
 const type = ref('customer')
 const isSignup = ref(false)
+const imageUrl = ref()
+const image = ref()
+const file = ref()
 
 const signup = async () => {
   isSignup.value = true
 
-  const user = {
-    name: name.value,
-    email: email.value,
-    password: password.value,
-    userType: type.value,
-  }
+  let formData = new FormData()
+  formData.append('name', name.value)
+  formData.append('email', email.value)
+  formData.append('password', password.value)
+  formData.append('userType', type.value)
+  if (image.value) formData.append('image', image.value)
 
-  await Axios.post(api.signUp, user)
+  await Axios.post(api.signUp, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
     .then(({ data }) => {
       authStore.sessionStore({
-        password: user.password,
-        email: user.email,
+        password: password.value,
+        email: email.value,
       })
 
       toast.success(
-        data?.message ?? `${user.userType == 'customer' ? 'Customer ' : 'Owner '} Sign Up Success!`
+        data?.message ?? `${type.value == 'customer' ? 'Customer ' : 'Owner '} Sign Up Success!`
       )
       router.push('/login')
     })
@@ -66,6 +77,18 @@ const signup = async () => {
       isSignup.value = false
     })
 }
+const handleFileUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    image.value = file
+    imageUrl.value = URL.createObjectURL(file)
+  }
+}
+const removeImage = () => {
+  imageUrl.value = null
+  image.value = null
+  file.value.value = null
+}
 </script>
 
 <template>
@@ -75,17 +98,39 @@ const signup = async () => {
         <img src="@/assets/img/signup.jpg" alt="Sign Up" class="full-image" />
       </div>
       <div class="flex-1 pa-10">
-        <h1 class="main-title">Sign Up</h1>
-        <p class="auth-detail">
-          Already have an account?
-          <RouterLink to="/login" class="route-link">Login</RouterLink>
-        </p>
         <Form @submit="signup()" :validation-schema="schema" v-slot="{ errors }">
-          <label for="type">Register As</label>
-          <select name="Type" id="type" v-model="type" class="input">
-            <option value="owner">Owner</option>
-            <option value="customer">Customer</option>
-          </select>
+          <div class="sm:flex justify-between items-end sm:space-x-5 md:space-x-10">
+            <div class="flex-1">
+              <h1 class="main-title">Sign Up</h1>
+              <p class="auth-detail">
+                Already have an account?
+                <RouterLink to="/login" class="route-link">Login</RouterLink>
+              </p>
+              <label for="type">Register As</label>
+              <select name="Type" id="type" v-model="type" class="input">
+                <option value="owner">Owner</option>
+                <option value="customer">Customer</option>
+              </select>
+            </div>
+            <div class="flex-1 text-end">
+              <label for="image" style="display: flex" class="items-center">
+                Upload Image
+                <ArrowUpTrayIcon
+                  class="upload-button mx-2"
+                  v-if="!imageUrl"
+                  @click="file.click()"
+                />
+                <input type="file" accept="image/*" ref="file" hidden @change="handleFileUpload" />
+              </label>
+              <div
+                v-if="imageUrl"
+                class="relative mt-2 sm:mt-2 md:mt-4 w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24"
+              >
+                <XMarkIcon class="remove-image" @click="removeImage()" />
+                <img :src="imageUrl" alt="Uploaded Image" class="uploaded-img-box" />
+              </div>
+            </div>
+          </div>
 
           <label for="name">{{ type == 'customer' ? 'User Name' : 'Restaurant Name' }}</label>
           <Field

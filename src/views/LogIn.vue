@@ -73,7 +73,7 @@ onMounted(() => {
 <template>
   <main class="auth flex items-center">
     <div class="auth-box" style="height: 600px">
-      <div class="flex-1 p-10">
+      <div class="flex-1 pa-10">
         <h1 class="main-title">Login</h1>
         <p class="auth-detail">
           Doesn't have an account yet?

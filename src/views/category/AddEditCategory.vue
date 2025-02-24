@@ -11,7 +11,7 @@ import toast from '@/plugin/toast'
 const route = useRoute()
 const router = useRouter()
 const schema = yup.object({
-  Title: yup.string().required().max(30),
+  Title: yup.string().required().max(50),
   Description: yup.string().required().max(500),
 })
 

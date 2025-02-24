@@ -68,64 +68,15 @@ onMounted(() => {
         @click="router.push(`/restaurant/${r._id}`)"
       >
         <div>
-          <!-- v-if="m.image && m.image != 'null' && m.image!='undefined'" -->
           <img
-            v-if="i % 10 == 0"
-            src="@/assets/img/restaurant/r-0.jpg"
+            v-if="r?.image && r.image != 'null' && r.image != 'undefined'"
+            :src="r.image"
             class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
             alt="Restaurant Image"
           />
           <img
-            v-if="i % 10 == 1"
-            src="@/assets/img/restaurant/r-1.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 2"
-            src="@/assets/img/restaurant/r-2.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 3"
-            src="@/assets/img/restaurant/r-3.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 4"
-            src="@/assets/img/restaurant/r-4.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 5"
-            src="@/assets/img/restaurant/r-5.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 6"
-            src="@/assets/img/restaurant/r-6.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 7"
-            src="@/assets/img/restaurant/r-7.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 8"
-            src="@/assets/img/restaurant/r-8.jpg"
-            class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
-            alt="Restaurant Image"
-          />
-          <img
-            v-if="i % 10 == 8"
-            src="@/assets/img/restaurant/r-8.jpg"
+            v-else
+            src="@/assets/img/default-restaurant.jpg"
             class="h-36 sm:h-48 md:h-56 md:h-72 w-36 sm:w-full object-cover"
             alt="Restaurant Image"
           />

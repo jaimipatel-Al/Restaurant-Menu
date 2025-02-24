@@ -12,7 +12,7 @@ import ComboItems from '@/components/elements/ComboItems.vue'
 const route = useRoute()
 const router = useRouter()
 const schema = yup.object({
-  Title: yup.string().required().max(30),
+  Title: yup.string().required().max(50),
   Price: yup
     .number()
     .required()

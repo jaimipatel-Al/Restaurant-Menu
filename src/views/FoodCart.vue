@@ -6,7 +6,9 @@ import api from '@/plugin/apis'
 import { useCartStore } from '@/stores/cartStore'
 import toast from '@/plugin/toast'
 import AddToCart from '@/components/elements/AddToCart.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const cart = ref([])
 const isLoading = ref(false)
 const cartStore = useCartStore()
@@ -147,6 +149,14 @@ onMounted(() => {
               <h3 class="text-sm sm:text-base md:text-lg lg:text-xl font-semibold">
                 {{ i.menuId?.name || i.itemId?.title }}
               </h3>
+              <p
+                class="text-xs md:text-sm text-orange-600 font-semibold cursor-pointer hover:underline"
+                @click="
+                  router.push(`/restaurant/${i.menuId?.createdBy?._id || i.itemId?.createdBy?._id}`)
+                "
+              >
+                {{ i.menuId?.createdBy?.name || i.itemId?.createdBy?.name }}
+              </p>
               <p class="quantity-cls font-semibold">
                 Quantity : {{ i.menuId?.subCategories?.length || i.itemId?.quantity }}
               </p>
